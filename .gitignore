@@ -1,0 +1,10 @@
+LICENSE
+setup.py
+*.pyc
+output.json
+__pycache__
+do_not_push
+output.txt
+input.txt
+event_log.txt
+.vscode

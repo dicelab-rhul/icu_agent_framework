@@ -1,0 +1,144 @@
+{
+    "environment": {
+        "env_hostname": "127.0.0.1",
+        "env_port": 1890,
+        "easter_egg": "the_port_number_sure_is_one"
+    },
+    "systems": {
+        "scales": {
+            "active": true,
+            "default_initial_state": 5,
+            "default_preferred_state": 5,
+            "default_rate_of_change": 0.1,
+            "default_grace_period": 2,
+            "Scale:0": {
+                "state": 4,
+                "custom_rate_of_change": null
+            },
+            "Scale:1": {
+                "state": 5,
+                "custom_rate_of_change": 0.3
+            },
+            "Scale:2": {
+                "state": 5,
+                "custom_rate_of_change": null
+            },
+            "Scale:3": {
+                "state": 5,
+                "custom_rate_of_change": 0.15
+            }
+        },
+        "tracking_widget": {
+            "active": true,
+            "rate_of_change": 0.1,
+            "default_grace_period": 2,
+            "target": {
+                "max_acceptable_delta_x": 10,
+                "max_acceptable_delta_y": 10,
+                "state": {
+                    "x": 100,
+                    "y": 142
+                }
+            }   
+        },
+        "pumps_and_tanks": {
+            "active": true,
+            "default_grace_period": 3,
+            "tanks": {
+                "FuelTankMain:A": {
+                    "state_matters": true,
+                    "min_acceptable_state": 4,
+                    "max_acceptable_state": 6,
+                    "state": "acceptable"
+                },
+                "FuelTankMain:B": {
+                    "state_matters": true,
+                    "min_acceptable_state": 4,
+                    "max_acceptable_state": 6,
+                    "state": "unacceptable"
+                },
+                "FuelTank:C": {
+                    "state_matters": false,
+                    "state": 0
+                },
+                "FuelTank:D": {
+                    "state_matters": false,
+                    "state": 0
+                },
+                "FuelTank:E": {
+                    "state_matters": false,
+                    "state": 0
+                },
+                "FuelTank:F": {
+                    "state_matters": false,
+                    "state": 0
+                }
+            },
+            "pumps": {
+                "default_failure_rate": 0.01,
+                "default_failure_duration": 10,
+                "pumpAB": {
+                    "active": true,
+                    "custom_failure_rate": 0.02,
+                    "custom_failure_duration": 5,
+                    "state": "idle"
+                },
+                "pumpBA": {
+                    "active": true,
+                    "custom_failure_rate": 0.03,
+                    "custom_failure_duration": 9,
+                    "state": "pumping"
+                },
+                "pumpEC": {
+                    "active": true,
+                    "custom_failure_rate": 0.1,
+                    "custom_failure_duration": 2,
+                    "state": "failure"
+                },
+                "pumpCA": {
+                    "active": true,
+                    "custom_failure_rate": null,
+                    "custom_failure_duration": null,
+                    "state": "idle"
+                },
+                "pumpEA": {
+                    "active": true,
+                    "custom_failure_rate": null,
+                    "custom_failure_duration": null,
+                    "state": "idle"
+                },
+                "pumpFD": {
+                    "active": true,
+                    "custom_failure_rate": null,
+                    "custom_failure_duration": null,
+                    "state": "idle"
+                },
+                "pumpDB": {
+                    "active": true,
+                    "custom_failure_rate": null,
+                    "custom_failure_duration": null,
+                    "state": "idle"
+                },
+                "pumpFB": {
+                    "active": true,
+                    "custom_failure_rate": null,
+                    "custom_failure_duration": null,
+                    "state": "idle"
+                }
+            }
+        },
+        "warning_lights": {
+            "active": true,
+            "default_grace_period": 2,
+            "green_light": {
+                "active": true,
+                "state": "on"
+                
+            },
+            "red_light": {
+                "active": true,
+                "state": "on"
+            }
+        }
+    }
+}
