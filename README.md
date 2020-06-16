@@ -1,6 +1,6 @@
 # The ICU Agent Platform
 
-The ICU agent platform is an agent framework based on [GOLEM](https://dl.acm.org/doi/10.1145/1619258.1619275). It encompasses teleoreactive agents which reason on incoming events from a system called ICU. They also provide feedback to the ICU system, if they detect that a corrective action is required by the ICU user.
+The ICU agent platform is an agent framework based on a Python3.8 implementation of the [GOLEM](https://dl.acm.org/doi/10.1145/1619258.1619275) reference model for agents and the agent environment. It also further specialises the agent architecture with a [teleo-reactive](https://dl.acm.org/doi/abs/10.5555/1618595.1618602) decision making programming style. Such paradigm enables any agent that uses it to process incoming events from an environment object called ICU. This object can be thought of as an application whose display simulates NASA’s well known [MATB-II](https://matb.larc.nasa.gov/) system. ICu is also further connected to an eye-tracker. Agents in the platfrom environment monitor changes to the ICU display. If, combining GUI events with eye tracking events, the agents find that the user is required to attend to a particular part of the ICU’s display, they advise the user by annotating the display with useful user feedback.
 
 ## Basic structure
 
@@ -8,11 +8,11 @@ Updated diagrams coming soon (the current ones are outdated).
 
 ## The environment
 
-The environment is the place where everything resides. It is home to a pool of agents, and the ICU application simulator. The environment is effectively the mediator between the agents and the spplication simulator. Every interaction between them passes through it. The components which are responsible for connecting the pool of agents and the application simulator are the dispatcher and the feedback listeners (see below).
+The environment is the place where everything resides. It is home to a pool of agents, and the ICU application simulator. The environment is effectively the mediator between the agents and the application simulator. Every interaction between them passes through it. The components which are responsible for connecting the pool of agents and the application simulator are the [dispatcher](#The dispatcher) and the feedback [listeners](#The feedback listeners).
 
 ### The enviroment configuration
 
-The  environment, the application simulator, and the eye tracker rely on certain parameters to work properly. The configuration can be found in `config.json`.
+The  environment, the application simulator, and the eye tracker rely on certain parameters to work properly. The configuration can be found in [config.json](https://github.com/dicelab-rhul/icu_agent_framework/blob/master/config.json).
 
 ### The application simulator
 
@@ -20,15 +20,15 @@ The `ICUApplicationSimulator` is a wrapper around the ICU system. It is responsi
 
 ### The agents
 
-The environment is home to the so called `ICUManagerAgent`s which, on a high level, receive events from the environment, reason about them, and provide feedback to the environment when necessary. See below for further details on the agent architecture.
+The environment is home to the so called `ICUManagerAgent`s which, on a high level, receive events from the environment, reason about them, and provide feedback to the environment when necessary. See [below](#The agent architecture) for further details on the agent architecture.
 
 ### The dispatcher
 
-The dispatcher is a wrapper over a `Process` which continuously pulls events from the application simulator, decodes the event type, and forwards each event to its intended recipient(s). The wrapper class is `ICUEnvironmentDispatcher`, and its main function is `__pull_and_dispatch(self)`. The dispatcher itself is created in the `__init__()` method of the environment (see the life cycle below).
+The dispatcher is a wrapper over a `Process` which continuously pulls events from the application simulator, decodes the event type, and forwards each event to its intended recipient(s). The wrapper class is `ICUEnvironmentDispatcher`, and its main function is `__pull_and_dispatch(self)`. The dispatcher itself is created in the `__init__()` method of the environment (see [below](#Environment life cycle)).
 
 ### The feedback listeners
 
-The feedback listeners are a list of wrappers over `Process`es which continuously wait for feedback from the pool of agents. Whenever a feedback is received, they forward it to the application simulator. The wrapper class is `ICUAgentListener`, and its main function is `__forward_feedback(self, agent_interface: socket)`. The listeners are created in the `__init__()` method of the environment (see the life cycle below).
+The feedback listeners are a list of wrappers over `Process`es which continuously wait for feedback from the pool of agents. Whenever a feedback is received, they forward it to the application simulator. The wrapper class is `ICUAgentListener`, and its main function is `__forward_feedback(self, agent_interface: socket)`. The listeners are created in the `__init__()` method of the environment (see [below](#Environment life cycle)).
 
 ### Communication via socket
 
