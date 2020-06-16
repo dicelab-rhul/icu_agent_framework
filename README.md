@@ -1,6 +1,6 @@
 # The ICU Agent Platform
 
-The ICU agent platform is an agent framework encompassing teleoreactive agents which reason on incoming events from a system called ICU. They also provide feedback to the ICU system, if they detect that a corrective action is required by the ICU user.
+The ICU agent platform is an agent framework based on [GOLEM](https://dl.acm.org/doi/10.1145/1619258.1619275). It encompasses teleoreactive agents which reason on incoming events from a system called ICU. They also provide feedback to the ICU system, if they detect that a corrective action is required by the ICU user.
 
 ## Basic structure
 
