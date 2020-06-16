@@ -8,7 +8,7 @@ Updated diagrams coming soon (the current ones are outdated).
 
 ## The environment
 
-The environment is the place where everything resides. It is home to a pool of agents, and the ICU application simulator. The environment is effectively the mediator between the agents and the application simulator. Every interaction between them passes through it. The components which are responsible for connecting the pool of agents and the application simulator are the [dispatcher](#The dispatcher) and the feedback [listeners](#The feedback listeners).
+The environment is the place where everything resides. It is home to a pool of agents, and the ICU application simulator. The environment is effectively the mediator between the agents and the application simulator. Every interaction between them passes through it. The components which are responsible for connecting the pool of agents and the application simulator are the [dispatcher](#the-dispatcher) and the feedback [listeners](#the-feedback-listeners).
 
 ### The enviroment configuration
 
@@ -20,15 +20,15 @@ The `ICUApplicationSimulator` is a wrapper around the ICU system. It is responsi
 
 ### The agents
 
-The environment is home to the so called `ICUManagerAgent`s which, on a high level, receive events from the environment, reason about them, and provide feedback to the environment when necessary. See [below](#The agent architecture) for further details on the agent architecture.
+The environment is home to the so called `ICUManagerAgent`s which, on a high level, receive events from the environment, reason about them, and provide feedback to the environment when necessary. See [below](#the-agent-architecture) for further details on the agent architecture.
 
 ### The dispatcher
 
-The dispatcher is a wrapper over a `Process` which continuously pulls events from the application simulator, decodes the event type, and forwards each event to its intended recipient(s). The wrapper class is `ICUEnvironmentDispatcher`, and its main function is `__pull_and_dispatch(self)`. The dispatcher itself is created in the `__init__()` method of the environment (see [below](#Environment life cycle)).
+The dispatcher is a wrapper over a `Process` which continuously pulls events from the application simulator, decodes the event type, and forwards each event to its intended recipient(s). The wrapper class is `ICUEnvironmentDispatcher`, and its main function is `__pull_and_dispatch(self)`. The dispatcher itself is created in the `__init__()` method of the environment (see [below](#environment-life-cycle)).
 
 ### The feedback listeners
 
-The feedback listeners are a list of wrappers over `Process`es which continuously wait for feedback from the pool of agents. Whenever a feedback is received, they forward it to the application simulator. The wrapper class is `ICUAgentListener`, and its main function is `__forward_feedback(self, agent_interface: socket)`. The listeners are created in the `__init__()` method of the environment (see [below](#Environment life cycle)).
+The feedback listeners are a list of wrappers over `Process`es which continuously wait for feedback from the pool of agents. Whenever a feedback is received, they forward it to the application simulator. The wrapper class is `ICUAgentListener`, and its main function is `__forward_feedback(self, agent_interface: socket)`. The listeners are created in the `__init__()` method of the environment (see [below](#environment-life-cycle)).
 
 ### Communication via socket
 
