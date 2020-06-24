@@ -1,6 +1,6 @@
 __author__ = "cloudstrife9999"
 
-from time import time_ns
+from time import time
 
 from icu_agent.icu_message import ICUMessage
 from icu_environment.icu_feedback import ICUFeedback
@@ -62,7 +62,7 @@ class ICUBelief():
 
     def get_backup(self) -> dict:
         return {
-            "_id": time_ns(),
+            "_id": time(),
             "data": self.__latest_perception_data,
             "metadata": self.__latest_perception_metadata,
             "received_messages": self.__latest_perception_messages
@@ -106,7 +106,7 @@ class ICUBelief():
         return self._visual_indicator_on
 
     def grace_period_expired(self) -> bool:
-        return time_ns() > self.__non_compliant_since + self.__grace_period_ns
+        return time() > self.__non_compliant_since + self.__grace_period_ns
 
     def is_user_looking(self) -> bool:
         x, y = self._user_eyes_location
