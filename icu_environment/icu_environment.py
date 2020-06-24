@@ -68,29 +68,34 @@ class ICUEnvironment():
         self.__dispatcher.start()
 
     def __init_server(self) -> None:
-        with socket(AF_INET, SOCK_STREAM) as s:
-            try:
-                s.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-                s.bind((self.__config["environment"]["hostname"], self.__config["environment"]["port"]))
+        try:
+            s: socket = socket(AF_INET, SOCK_STREAM)
+            s.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+            s.bind(("0.0.0.0", self.__config["environment"]["env_port"]))
+            s.listen(4)
 
-                self.__server_socket = s
+            self.__server_socket = s
 
-                print("Environment started.\n")
-            except IOError:
-                pass # TODO:
+            print(s)
+
+            print("Environment started.\n")
+        except IOError as e:
+            print(e)
 
     def __build_agents(self) -> None:
         event_generator_groups: dict = self.__config["systems"]
 
         for k, v in event_generator_groups.items():
-            agent: ICUManagerAgent = build_manager_agent(managed_group=k, managed_group_info=v, env_interface=(self.__config["environment"]["hostname"], self.__config["environment"]["port"]))
+            agent: ICUManagerAgent = build_manager_agent(managed_group=k, managed_group_info=v, env_interface=(self.__config["environment"]["env_hostname"], self.__config["environment"]["env_port"]))
             self.__manager_agents.append(agent)
 
             # Note: there is no race condition here, because the agent will indefinitely retry to connect upon failure.
             agent.start()
-            socket_with_agent, _ = self.__server_socket.accept()
-
-            self.__manager_agent_interfaces[k] = socket_with_agent
+            try:
+                socket_with_agent, _ = self.__server_socket.accept()
+                self.__manager_agent_interfaces[k] = socket_with_agent
+            except Exception as e:
+                print(e)
 
     def __build_agent_listeners(self):
         for _, agent_interface in self.__manager_agent_interfaces.items():

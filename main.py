@@ -10,7 +10,7 @@ from icu_environment.icu_environment import ICUEnvironment
 
 def check_preconditions() -> None:
     minimum_major = 3
-    minimum_minor = 8
+    minimum_minor = 5
     minimum_version = "{}.{}".format(minimum_major, minimum_minor)
 
     if version_info.major < minimum_major or version_info.minor < minimum_minor:

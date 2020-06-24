@@ -26,7 +26,8 @@ class ICUAgentProcess(Process):
     def run(self) -> None:
         try:
             super().run()
-        except Exception:
+        except Exception as e:
+            print(e)
             print("{} {} (managing {}): stopped.".format(type(self).__name__, self.__agent_id, self.__managed_generator))
 
 
@@ -73,9 +74,11 @@ class ICUManagerAgent(ICUAbstractAgent):
     def __activate(self) -> None:
         while not self.__connected:
             try:
+                sleep(0.5)
                 self.__env_socket.connect((self.__env_hostname, self.__env_port))
                 self.__connected = True
-            except Exception:
+            except Exception as e:
+                print(e)
                 continue
 
         self.__actuators[0].activate(self.__env_socket)

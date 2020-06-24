@@ -140,7 +140,7 @@ class ICUWarningLightBelief(ICUBelief):
     def _update_current_state(self) -> None:
         latest_perception: dict = self.get_latest_perception_data()
 
-        if latest_perception is None: # We do not need to change the state.
+        if latest_perception is None or len(latest_perception.keys()) == 0: # We do not need to change the state.
             return
 
         # TODO: I am not sure this works as intended (i.e., what does the highlight event represent?)
@@ -201,7 +201,7 @@ class ICUScaleBelief(ICUBelief):
     def _update_current_state(self) -> None:
         latest_perception: dict = self.get_latest_perception_data()
 
-        if latest_perception is None: # We do not need to change the state.
+        if latest_perception is None or len(latest_perception.keys()) == 0: # We do not need to change the state.
             return
 
         # TODO: I am not sure this works as intended (i.e., what does the highlight event represent?)
@@ -247,7 +247,7 @@ class ICUPumpBelief(ICUBelief):
     def _update_current_state(self) -> None:
         latest_perception: dict = self.get_latest_perception_data()
 
-        if latest_perception is None: # We do not need to change the state.
+        if latest_perception is None or len(latest_perception.keys()) == 0: # We do not need to change the state.
             return
 
         # TODO: I am not sure this works as intended (i.e., what does the highlight event represent?)
@@ -314,7 +314,7 @@ class ICUTrackingWidgetBelief(ICUBelief):
     def _update_current_state(self) -> None:
         latest_perception: dict = self.get_latest_perception_data()
 
-        if latest_perception is None: # We do not need to change the state.
+        if latest_perception is None or len(latest_perception.keys()) == 0: # We do not need to change the state.
             return
 
         # TODO: I am not sure this works as intended (i.e., what does the highlight event represent?)
