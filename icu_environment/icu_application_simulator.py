@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 __author__ = "cloudstrife9999"
 
 
@@ -45,21 +43,14 @@ class EyeTrackerProcess(Process):
 
 
     def __run_eye_tracker(self, duration=5, calibrate_system=True, sample_rate=40) -> None:
-        try:
-            io = self.__connect_eyetracker(sample_rate=sample_rate)
-        
+         with self.__connect_eyetracker(sample_rate=sample_rate) as io:
             tracker = io.devices.tracker
-        
+            
             if calibrate_system:
                 self.__calibrate(tracker)
-        
+            
             for event in self.__stream(tracker, duration):
                 print(event) #do some stuff
-        except Exception:
-            io.quit()
-            
-        if io:
-            io.quit()
 
 
     def __connect_eyetracker(self, sample_rate = 300):    
@@ -109,25 +100,9 @@ class ICUApplicationSimulator():
         if not self.__sink.empty():
             return self.__sink.get()
 
-    '''
-    def pull(self, expected_generator: str) -> object:
-        if self.get_proc().is_alive():
-            event: Event = None
-
-            while event is None:
-                event = sim.get_event()
-
-            return event
-    '''
-
-    def has_data_to_pull(self, expected_generator: str) -> bool:
-        return self.get_proc().is_alive()
-
     def push_feedback(self, feedback: dict) -> None:
         to_send: Tuple = (feedback["src"], feedback["dst"], feedback["data"])
         self.__source.source(src=to_send[0], dst=to_send[1], data=to_send[2])
-
-        #print("Application simulator wrapper: received feedback: {}".format(feedback))
 
 
 # THIS IS ONLY FOR DEBUG. THE REAL __main__ is in main.py.
@@ -140,14 +115,6 @@ if __name__ == "__main__":
         event: Event = None
 
         while event is None:
-        #while event is None or event.src == "EyeTrackerStub":
-        #while event is None or "Scale" not in event.src:
             event = sim.get_event()
-
-
-        '''
-        if event.src == "Pump":
-            send_to_pump_subscriber()
-        '''
 
         print(event)

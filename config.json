@@ -1,5 +1,12 @@
 {
+    "glossary": {
+        "active": "For a widget, it means that it is displayed on the GUI",
+        "default_grace_period": "The grace period for the user to act when needed.",
+        "[custom/default]_rate_of_change":  "The rate of event occurrences for a particolar widget (irrelevant here?)",
+        "TBA": "TBA"
+    },
     "environment": {
+        "env_binding_address": "0.0.0.0",
         "env_hostname": "127.0.0.1",
         "env_port": 1890,
         "easter_egg": "the_port_number_sure_is_one"

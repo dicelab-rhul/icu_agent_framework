@@ -20,7 +20,6 @@ def check_preconditions() -> bool:
     return True
 
 
-# TODO: check whether or not to load a saved state.
 def main() -> None:
     if not check_preconditions():
         return
