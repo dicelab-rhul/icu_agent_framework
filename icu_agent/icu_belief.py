@@ -239,7 +239,7 @@ class ICUPumpBelief(ICUBelief):
 
     def is_level_unacceptable(self) -> bool:
         for tank in filter(lambda tank: self._current_state["tanks"][tank]["state_matters"], self._current_state["tanks"]):
-            if tank["state"] == "unacceptable":
+            if self._current_state["tanks"][tank] == "unacceptable":
                 return True
 
         return False

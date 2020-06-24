@@ -1,4 +1,7 @@
+#!/usr/bin/env python3
+
 __author__ = "cloudstrife9999"
+
 
 from multiprocessing import Process
 from typing import Optional, Tuple, Iterator

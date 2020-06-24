@@ -66,6 +66,11 @@ class ICUEnvironment():
         self.__icu.start()
         self.__dispatcher: ICUEnvironmentDispatcher = ICUEnvironmentDispatcher(target=self.__pull_and_dispatch)
         self.__dispatcher.start()
+        self.__wait()
+
+    def __wait(self) -> None:
+        while self.__icu.get_proc().is_alive():
+            continue
 
     def __init_server(self) -> None:
         try:
