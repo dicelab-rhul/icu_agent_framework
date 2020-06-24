@@ -1,6 +1,11 @@
 __author__ = "cloudstrife9999"
 
-from time import time
+from sys import version_info
+
+if version_info.major + version_info.minor / 10 < 3.7:
+    from time import time
+else:
+    from time import time_ns as time
 
 from icu_agent.icu_message import ICUMessage
 from icu_environment.icu_feedback import ICUFeedback

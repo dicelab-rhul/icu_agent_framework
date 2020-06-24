@@ -5,7 +5,14 @@ __author__ = "cloudstrife9999"
 
 from multiprocessing import Process
 from typing import Optional, Tuple, Iterator
-from time import sleep, time
+from time import sleep
+
+from sys import version_info
+
+if version_info.major + version_info.minor / 10 < 3.7:
+    from time import time
+else:
+    from time import time_ns as time
 
 from icu import start as start_application_simulator, ExternalEventSink, ExternalEventSource
 from icu.event import Event
