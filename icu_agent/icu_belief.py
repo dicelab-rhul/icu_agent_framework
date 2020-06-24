@@ -238,7 +238,7 @@ class ICUPumpBelief(ICUBelief):
         return {generator: self._managed_group_info[generator] for generator in self._managed_event_generators}
 
     def is_level_unacceptable(self) -> bool:
-        for tank in filter(lambda tank: tank["state_matters"], self._current_state["tanks"]):
+        for tank in filter(lambda tank: self._current_state["tanks"][tank]["state_matters"], self._current_state["tanks"]):
             if tank["state"] == "unacceptable":
                 return True
 
