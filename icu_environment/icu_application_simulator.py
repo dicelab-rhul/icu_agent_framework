@@ -5,7 +5,7 @@ __author__ = "cloudstrife9999"
 
 from multiprocessing import Process
 from typing import Optional, Tuple, Iterator
-from time import sleep, time_ns
+from time import sleep, time
 
 from icu import start as start_application_simulator, ExternalEventSink, ExternalEventSource
 from icu.event import Event
@@ -76,8 +76,8 @@ class EyeTrackerProcess(Process):
     def __stream(self, tracker, duration) -> Iterator:
         tracker.setRecordingState(True)
 
-        stime = time_ns()
-        while time_ns()-stime < duration:
+        stime = time()
+        while time()-stime < duration:
             for e in tracker.getEvents(asType='dict'):
                 #logic to remove bad samples
                 yield (e['left_gaze_x'], e['left_gaze_y'], e['time'])
