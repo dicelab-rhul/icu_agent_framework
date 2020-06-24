@@ -27,6 +27,7 @@ class ICUAgentProcess(Process):
         try:
             super().run()
         except Exception as e:
+            raise e
             print(e)
             print("{} {} (managing {}): stopped.".format(type(self).__name__, self.__agent_id, self.__managed_generator))
 

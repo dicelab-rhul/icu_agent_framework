@@ -183,14 +183,14 @@ class ICUScaleBelief(ICUBelief):
 
     def is_too_low(self) -> bool:
         for scale in filter(lambda k: "Scale" in k, self._current_state):
-            if scale["state"] < 0: # TODO: I am not sure this is the right condition.
+            if self._current_state[scale]["state"] < 0: # TODO: I am not sure this is the right condition.
                 return True
 
         return False
 
     def is_too_high(self) -> bool:
         for scale in filter(lambda k: "Scale" in k, self._current_state):
-            if scale["state"] > 0: # TODO: I am not sure this is the right condition.
+            if self._current_state[scale]["state"] > 0: # TODO: I am not sure this is the right condition.
                 return True
 
         return False
@@ -277,22 +277,22 @@ class ICUTrackingWidgetBelief(ICUBelief):
         super().__init__(agent_id=agent_id, managed_group=managed_group, managed_group_info=managed_group_info)
 
     def _unpack_event_generators(self) -> list:
-        return [generator for generator in filter(lambda k: "light" in k, self._managed_group_info)]
+        return [generator for generator in filter(lambda k: "target" in k, self._managed_group_info)]
 
     def _unpack_initial_state(self) -> dict:
         return {generator: self._managed_group_info[generator] for generator in self._managed_event_generators}
 
     def is_x_too_small(self) -> bool:
-        return self._current_state["target"]["x"] < self._managed_group_center_x - self._current_state["target"]["max_acceptable_delta_x"]
+        return self._current_state["target"]["state"]["x"] < self._managed_group_center_x - self._current_state["target"]["max_acceptable_delta_x"]
 
     def is_x_too_big(self) -> bool:
-        return self._current_state["target"]["x"] > self._managed_group_center_x + self._current_state["target"]["max_acceptable_delta_x"]
+        return self._current_state["target"]["state"]["x"] > self._managed_group_center_x + self._current_state["target"]["max_acceptable_delta_x"]
 
     def is_y_too_small(self) -> bool:
-        return self._current_state["target"]["y"] < self._managed_group_center_y - self._current_state["target"]["max_acceptable_delta_y"]
+        return self._current_state["target"]["state"]["y"] < self._managed_group_center_y - self._current_state["target"]["max_acceptable_delta_y"]
 
     def is_y_too_big(self) -> bool:
-        return self._current_state["target"]["y"] > self._managed_group_center_y + self._current_state["target"]["max_acceptable_delta_y"]
+        return self._current_state["target"]["state"]["y"] > self._managed_group_center_y + self._current_state["target"]["max_acceptable_delta_y"]
 
     def is_x_out_of_bounds(self) -> bool:
         return self.is_x_too_small() or self.is_x_too_big()
@@ -330,7 +330,7 @@ class ICUTrackingWidgetBelief(ICUBelief):
             self._current_state["target"]["state"]["x"] += perception_data["dx"]
             self._current_state["target"]["state"]["y"] += perception_data["dy"]
 
-def generate_feedback(self) -> None:
+    def generate_feedback(self) -> None:
         agent_id: str = self.get_agent_id()
         target: str = self._managed_group
 
