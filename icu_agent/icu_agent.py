@@ -5,7 +5,6 @@ from json import loads
 from multiprocessing import Process
 from typing import Optional, Callable, Any
 from time import sleep
-from colorama import Fore, Style
 
 from icu_agent.icu_agent_mind import ICUTeleoreactiveMind
 from icu_agent.icu_actions import ICUAction
@@ -26,10 +25,10 @@ class ICUAgentProcess(Process):
     def run(self) -> None:
         try:
             super().run()
+        except KeyboardInterrupt:
+            print("{} process: killed by a keyboard interrupt.".format(self.__agent_id))
         except Exception as e:
-            raise e
-            print(e)
-            print("{} {} (managing {}): stopped.".format(type(self).__name__, self.__agent_id, self.__managed_generator))
+            print("{} {} (managing {}): stopped due to {}.".format(type(self).__name__, self.__agent_id, self.__managed_generator, e))
 
 
 class ICUAbstractAgent():
@@ -53,6 +52,7 @@ class ICUManagerAgent(ICUAbstractAgent):
     def __init__(self, mind: ICUTeleoreactiveMind, actuators: list, sensors: list, env_hostname: str, env_port: int):
         super().__init__(mind=mind)
 
+        self.__finished: bool = False
         self.__env_hostname: str = env_hostname
         self.__env_port: int = env_port
         self.__env_socket: socket = socket(AF_INET, SOCK_STREAM)
@@ -65,6 +65,12 @@ class ICUManagerAgent(ICUAbstractAgent):
 
     def get_env_port(self) -> int:
         return self.__env_port
+
+    def kill(self) -> None:
+        self.__finished = True
+
+        if self.get_process() is not None:
+            self.get_process().kill()
 
     def start(self) -> None:
         process: ICUAgentProcess = ICUAgentProcess(agent_id=self.get_id(), managed_generator=self.get_managed_group(), target=self.run)
@@ -86,21 +92,22 @@ class ICUManagerAgent(ICUAbstractAgent):
         self.__sensors[0].activate(self.__env_socket)
 
     def run(self) -> None:
-        self.__activate()
+        try:
+            self.__activate()
 
-        print("Agent {} started! Ready to manage {}.".format(self.get_id(), self.get_managed_group()))
+            print("Agent {} started! Ready to manage {}.".format(self.get_id(), self.get_managed_group()))
 
-        cycle_number: int = 1
+            cycle_number: int = 1
 
-        while True:
-            try:
+            while not self.__finished:
                 cycle_number = self.__begin_new_cycle(cycle_number=cycle_number)
-
                 self.__cycle_step(cycle_number=cycle_number)
-            except KeyboardInterrupt:
-                self.__env_socket.close()
-                print("Agent {} (managing {}): stopping...".format(self.get_id(), self.get_managed_group()))
-                self.get_process().kill()
+        except KeyboardInterrupt:
+            self.__env_socket.close()
+            print("Agent {}: killed by a keyboard interrupt.".format(self.get_id()))
+        except Exception as e:
+            self.__env_socket.close()
+            print("Agent {}: killed by {}.".format(self.get_id(), e))
 
     def __cycle_step(self, cycle_number: int) -> None:
         if cycle_number > 1:
@@ -116,10 +123,12 @@ class ICUManagerAgent(ICUAbstractAgent):
     def __begin_new_cycle(self, cycle_number: int) -> int:
         cycle_number += 1
 
+        '''
         if cycle_number % 7 == 0:
             message: str = "\n\n\n\n\n##########\n" + "Final Fantasy VII is the best!!!" + "\n##########\n\n\n\n"
             print("{}{}{}{}".format(Style.BRIGHT, Fore.BLUE, message, Style.RESET_ALL))
             sleep(7)
+        '''
 
         return cycle_number
     

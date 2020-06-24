@@ -4,7 +4,6 @@ from typing import List, Iterator
 from multiprocessing import  Process
 from socket import socket, AF_INET, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
 from json import dumps, loads
-from sys import exit
 
 from icu_agent.icu_agent import ICUManagerAgent
 from icu_agent.icu_agent_factory import build_manager_agent
@@ -39,8 +38,10 @@ class ICUEnvironmentDispatcher(Process):
     def run(self) -> None:
         try:
             super().run()
-        except Exception:
-            exit(-1) #TODO: implement a clean exit.
+        except KeyboardInterrupt:
+            print("Event dispatcher: killed by a keyboard interrupt.")
+        except Exception as e:
+            print("Event dispatcher: killed by {}.".format(e))
 
 class ICUAgentListener(Process):
     def __init__(self, target, args=[]):
@@ -49,8 +50,10 @@ class ICUAgentListener(Process):
     def run(self) -> None:
         try:
             super().run()
-        except Exception:
-            exit(-1) #TODO: implement a clean exit.
+        except KeyboardInterrupt:
+            print("Agent listener: killed by a keyboard interrupt.")
+        except Exception as e:
+            print("Agent listener: killed by {}.".format(e))
 
 class ICUEnvironment():
     def __init__(self, config: dict) -> None:
@@ -60,7 +63,7 @@ class ICUEnvironment():
         self.__server_socket: socket
         self.__init_server()
         self.__build_agents()
-        self.__agent_listeners: list = []
+        self.__agent_listeners: List[ICUAgentListener] = []
         self.__build_agent_listeners()
         self.__icu: ICUApplicationSimulator = ICUApplicationSimulator()
         self.__icu.start()
@@ -69,8 +72,30 @@ class ICUEnvironment():
         self.__wait()
 
     def __wait(self) -> None:
-        while self.__icu.get_proc().is_alive():
-            continue
+        try:
+            while self.__icu.get_proc().is_alive():
+                continue
+        except KeyboardInterrupt:
+            self.__clean_exit()
+            print("Main environment process: killed by a keyboard interrupt.")
+            return
+        except Exception as e:
+            self.__clean_exit()
+            print("Main environment process: killed by {}.".format(e))
+            return
+
+    def __clean_exit(self) -> None:
+        for listener in self.__agent_listeners:
+            if listener is not None and listener.is_alive():
+                listener.kill()
+
+        self.__dispatcher.kill()
+
+        for agent in self.__manager_agents:
+            agent.kill()
+
+        for s in self.__manager_agent_interfaces.values():
+            s.close()
 
     def __init_server(self) -> None:
         try:
