@@ -170,10 +170,19 @@ class ICUEnvironment():
             self.__notify_agent_with_event(managed_group=managed_group, event=event)
 
     def __notify_agent_with_event(self, managed_group: str, event: Event) -> None:
-        event_data: dict = event.serialise()
+        event_data: dict = self.__serialise_event(event=event)
         perception_data: dict = self.__build_perception_from_event(event_data=event_data, managed_group=managed_group)
 
         self.__notify_agent(managed_group=managed_group, perception_data=perception_data)
+
+    def __serialise_event(self, event: Event) -> dict:
+        return {
+            "src": event.src,
+            "dst": event.dst,
+            "data": event.data.__dict__,
+            "name": event.name,
+            "timestamp": event.timestamp,
+        }
 
     def __build_perception_from_event(self, event_data: dict, managed_group: str) -> dict:
         return {"data": event_data, "metadata": {"event": "pull", "success": True, "src": managed_group}}
