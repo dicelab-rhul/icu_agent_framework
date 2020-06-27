@@ -150,7 +150,7 @@ class ICUEnvironment():
     def __get_event_generator_group(self, src, dst) -> str:
         if "Highlight" in src:
             return "highlight"
-        elif "FuelTank" in src or "FuelTankMain" in src or "Pump" in src:
+        elif "FuelTank" in src or "Pump" in src:
             return "pumps_and_tanks"
         elif "Target" in dst:
             return "tracking_widget"
