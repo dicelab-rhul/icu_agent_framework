@@ -7,7 +7,6 @@ if version_info.major + version_info.minor / 10 < 3.7:
 else:
     from time import time_ns as time
 
-from icu_agent.icu_message import ICUMessage
 from icu_environment.icu_feedback import ICUFeedback
 from icu_exceptions import ICUException, ICUAbstractMethodException
 
@@ -78,28 +77,12 @@ class ICUBelief():
 
     def generate_feedback(self) -> None:
         raise ICUAbstractMethodException()
-    
-    def get_next_feedback(self) -> ICUFeedback:
-        return self.__next_feedback
-
-    # BEGIN OBSOLETE METHODS
-
-    def get_next_message(self) -> ICUMessage:
-        return self.__next_message
-
-    def get_next_message_recipients(self) -> set:
-        return self.__next_message_recipients
-
-    def set_next_message(self, message: ICUMessage) -> None:
-        self.__next_message: ICUMessage = message
-
-    def set_next_message_recipients(self, next_message_recipients: set) -> None:
-        self.__next_message_recipients: set = next_message_recipients
 
     def _set_next_feedback(self, feedback: ICUFeedback) -> None:
         self.__next_feedback = feedback
-
-    # END OBSOLETE METHODS
+    
+    def get_next_feedback(self) -> ICUFeedback:
+        return self.__next_feedback
 
     def _unpack_event_generators(self) -> list:
         raise ICUAbstractMethodException()

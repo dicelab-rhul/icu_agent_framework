@@ -140,7 +140,6 @@ class ICUEnvironment():
     def __pull_and_dispatch(self) -> None:
         while True:
             event: Event = self.__icu.get_event()
-            print(event)
             event_generator_group: str = self.__get_event_generator_group(src=event.src, dst=event.dst)
 
             if event_generator_group == "empty":

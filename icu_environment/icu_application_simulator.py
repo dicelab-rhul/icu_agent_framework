@@ -26,7 +26,7 @@ class ICUApplicationSimulatorProcess(Process):
     def run(self) -> None:
         try:
             super().run()
-            #TODO: start the eye tracker.
+            #TODO: start the eye tracker (?).
         except Exception:
             print("{}: stopped.".format(type(self).__name__))
 
