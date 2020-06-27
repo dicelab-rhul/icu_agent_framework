@@ -143,13 +143,17 @@ class ICUEnvironment():
             print(event)
             event_generator_group: str = self.__get_event_generator_group(src=event.src, dst=event.dst)
 
-            if event_generator_group in ("eye_tracker", "highlight"):
+            if event_generator_group == "empty":
+                continue # i.e., discard the useless empty event, and get a new one.
+            elif event_generator_group in ("eye_tracker", "highlight"):
                 self.__broadcast_event(event=event)
             else:
                 self.__notify_agent_with_event(managed_group=event_generator_group, event=event)
 
     def __get_event_generator_group(self, src, dst) -> str:
-        if "Highlight" in src:
+        if src == "empty":
+            return "empty"
+        elif "Highlight" in src:
             return "highlight"
         elif "FuelTank" in src or "Pump" in src:
             return "pumps_and_tanks"
@@ -171,19 +175,10 @@ class ICUEnvironment():
             self.__notify_agent_with_event(managed_group=managed_group, event=event)
 
     def __notify_agent_with_event(self, managed_group: str, event: Event) -> None:
-        event_data: dict = self.__serialise_event(event=event)
+        event_data: dict = event.serialise()
         perception_data: dict = self.__build_perception_from_event(event_data=event_data, managed_group=managed_group)
 
         self.__notify_agent(managed_group=managed_group, perception_data=perception_data)
-
-    def __serialise_event(self, event: Event) -> dict:
-        return {
-            "src": event.src,
-            "dst": event.dst,
-            "data": event.data.__dict__,
-            "name": event.name,
-            "timestamp": event.timestamp,
-        }
 
     def __build_perception_from_event(self, event_data: dict, managed_group: str) -> dict:
         return {"data": event_data, "metadata": {"event": "pull", "success": True, "src": managed_group}}
