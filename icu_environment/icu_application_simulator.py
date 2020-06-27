@@ -97,8 +97,17 @@ class ICUApplicationSimulator():
         self.__p, self.__m = start_application_simulator(sinks=[self.__sink], sources=[self.__source])
 
     def get_event(self) -> Event:
+        while self.__sink.empty(): #not great...
+            pass
+        return self.__sink.get()
+
+        """
         if not self.__sink.empty():
-            return self.__sink.get()
+            event = self.__sink.get()
+            print("GET EVENT:", event)
+            return event
+        print("NO EVENT...")
+        """
 
     def push_feedback(self, feedback: dict) -> None:
         to_send: Tuple = (feedback["src"], feedback["dst"], feedback["data"])
