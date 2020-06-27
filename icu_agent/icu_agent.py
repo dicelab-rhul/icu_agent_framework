@@ -119,6 +119,8 @@ class ICUManagerAgent(ICUAbstractAgent):
 
         if action != None:
             self.execute(action=action)
+        else:
+            print("idle")
 
     def __begin_new_cycle(self, cycle_number: int) -> int:
         cycle_number += 1
@@ -129,7 +131,7 @@ class ICUManagerAgent(ICUAbstractAgent):
         return self.get_mind().get_working_memory().get_belief().get_managed_group()
 
     def execute(self, action: ICUAction) -> None:
-        #print("Agent {} (managing {}): sending {} to the env.".format(self.get_id(), self.get_managed_group(), type(action)))
+        print("Agent {} (managing {}): sending {} to the env.".format(self.get_id(), self.get_managed_group(), type(action)))
 
         self.__actuators[0].attempt(action)
 

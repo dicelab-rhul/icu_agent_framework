@@ -4,8 +4,9 @@ __author__ = "cloudstrife9999"
 from multiprocessing import Process
 from typing import Optional, Tuple, Iterator
 from time import sleep
-
+from contextlib import redirect_stdout
 from sys import version_info
+from os import devnull
 
 if version_info.major + version_info.minor / 10 < 3.7:
     from time import time
@@ -16,20 +17,9 @@ from icu import start as start_application_simulator, ExternalEventSink, Externa
 from icu.event import Event
 from icu.process import PipedMemory
 
+# BEGIN OF POTENTIALLY UNNEDED CODE #
+
 from psychopy.iohub import launchHubServer
-
-
-class ICUApplicationSimulatorProcess(Process):
-    def __init__(self, target, args):
-        super().__init__(target=target, args=args, group=None)
-
-    def run(self) -> None:
-        try:
-            super().run()
-            #TODO: start the eye tracker (?).
-        except Exception:
-            print("{}: stopped.".format(type(self).__name__))
-
 
 class EyeTrackerProcess(Process):
     def __init__(self, target, args=[]):
@@ -80,8 +70,11 @@ class EyeTrackerProcess(Process):
                 #logic to remove bad samples
                 yield (e['left_gaze_x'], e['left_gaze_y'], e['time'])
 
+# END OF POTENTIALLY UNNEDED CODE #
+
 class ICUApplicationSimulator():
-    def __init__(self):
+    def __init__(self, verbose=False):
+        self.__verbose: bool = verbose
         self.__source: ExternalEventSource = ExternalEventSource()
         self.__sink: ExternalEventSink = ExternalEventSink()
         self.__p: Optional[Process] = None
@@ -94,7 +87,12 @@ class ICUApplicationSimulator():
         return self.__m
 
     def start(self, *args, **kwargs) -> None:
-        self.__p, self.__m = start_application_simulator(sinks=[self.__sink], sources=[self.__source])
+        if self.__verbose:
+            self.__p, self.__m = start_application_simulator(sinks=[self.__sink], sources=[self.__source])
+        else:
+            with open(devnull, "w") as f:
+                with redirect_stdout(f):
+                    self.__p, self.__m = start_application_simulator(sinks=[self.__sink], sources=[self.__source])
 
     def get_event(self) -> Event:
         if self.__sink.empty():
@@ -103,7 +101,14 @@ class ICUApplicationSimulator():
             return self.__sink.get()
 
     def push_feedback(self, feedback: dict) -> None:
+        # This is to prevent a race condition.
+        while self.__p is None:
+            continue
+
         to_send: Tuple = (feedback["src"], feedback["dst"], feedback["data"])
+
+        print("Sending {} to ICU.".format(feedback))
+
         self.__source.source(src=to_send[0], dst=to_send[1], data=to_send[2])
 
 

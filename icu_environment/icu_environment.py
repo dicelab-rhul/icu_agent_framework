@@ -17,8 +17,8 @@ Environment life cycle:
 
 1) The configuration is loaded.
 2) The server socket (w.r.t. agents) is initialised.
-3) For each event generator group (see config file) a new agent is spawned.
-4) The ICU application simulator is created and booted, together with the eye tracker.
+3) The ICU application simulator is created and booted, together with the eye tracker.
+4) For each event generator group (see config file) a new agent is spawned.
 5) The agent listerner processes are created, one for each agent. They wait for feedback, and forward it to the ICU simulator
     - wait for feedback
     - send the received feedback to the ICU
@@ -62,11 +62,11 @@ class ICUEnvironment():
         self.__manager_agent_interfaces: dict = {}
         self.__server_socket: socket
         self.__init_server()
+        self.__icu: ICUApplicationSimulator = ICUApplicationSimulator(verbose=True)
+        self.__icu.start()
         self.__build_agents()
         self.__agent_listeners: List[ICUAgentListener] = []
         self.__build_agent_listeners()
-        self.__icu: ICUApplicationSimulator = ICUApplicationSimulator()
-        self.__icu.start()
         self.__dispatcher: ICUEnvironmentDispatcher = ICUEnvironmentDispatcher(target=self.__pull_and_dispatch)
         self.__dispatcher.start()
         self.__wait()
@@ -128,14 +128,14 @@ class ICUEnvironment():
         for _, agent_interface in self.__manager_agent_interfaces.items():
             self.__agent_listeners.append(ICUAgentListener(target=self.__forward_feedback, args=[agent_interface]))
 
+        for agent_listener in self.__agent_listeners:
+            agent_listener.start()
+
     def __forward_feedback(self, agent_interface: socket):
         raw: str = read_utf8_str(s=agent_interface)
-        feedback: dict = loads(s=raw)
-
-        assert "src" in feedback and "dst" in feedback and "data" in feedback
+        feedback: dict = loads(s=raw)["details"]
 
         self.__icu.push_feedback(feedback=feedback)
-
 
     def __pull_and_dispatch(self) -> None:
         while True:
