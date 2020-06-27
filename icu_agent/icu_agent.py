@@ -123,20 +123,13 @@ class ICUManagerAgent(ICUAbstractAgent):
     def __begin_new_cycle(self, cycle_number: int) -> int:
         cycle_number += 1
 
-        '''
-        if cycle_number % 7 == 0:
-            message: str = "\n\n\n\n\n##########\n" + "Final Fantasy VII is the best!!!" + "\n##########\n\n\n\n"
-            print("{}{}{}{}".format(Style.BRIGHT, Fore.BLUE, message, Style.RESET_ALL))
-            sleep(7)
-        '''
-
         return cycle_number
     
     def get_managed_group(self) -> str:
         return self.get_mind().get_working_memory().get_belief().get_managed_group()
 
     def execute(self, action: ICUAction) -> None:
-        print("Agent {} (managing {}): sending {} to the env.".format(self.get_id(), self.get_managed_group(), type(action)))
+        #print("Agent {} (managing {}): sending {} to the env.".format(self.get_id(), self.get_managed_group(), type(action)))
 
         self.__actuators[0].attempt(action)
 
