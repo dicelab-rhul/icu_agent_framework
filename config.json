@@ -9,7 +9,8 @@
         "env_binding_address": "0.0.0.0",
         "env_hostname": "127.0.0.1",
         "env_port": 1890,
-        "easter_egg": "the_port_number_sure_is_one"
+        "easter_egg": "the_port_number_sure_is_one",
+        "verbose_agents": false
     },
     "systems": {
         "scales": {

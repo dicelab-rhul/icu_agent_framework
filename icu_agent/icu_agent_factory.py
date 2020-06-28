@@ -6,10 +6,10 @@ from icu_agent.icu_memory import ICUMindInternalStorage
 from icu_exceptions import ICUException
 
 
-def build_manager_agent(managed_group: str, managed_group_info: dict, env_interface: tuple) -> ICUManagerAgent:
+def build_manager_agent(managed_group: str, managed_group_info: dict, env_interface: tuple, verbose: bool) -> ICUManagerAgent:
     mind: ICUTeleoreactiveMind = build_manager_agent_mind(managed_group=managed_group, managed_group_info=managed_group_info)
     
-    return ICUManagerAgent(mind, [ICUWorkerAgentActuator()], [ICUWorkerAgentSensor()], env_interface[0], env_interface[1])
+    return ICUManagerAgent(mind, [ICUWorkerAgentActuator()], [ICUWorkerAgentSensor()], env_interface[0], env_interface[1], verbose=verbose)
 
 def build_manager_agent_mind(managed_group: str, managed_group_info: dict) -> ICUTeleoreactiveMind:
     storage: ICUMindInternalStorage = ICUMindInternalStorage()

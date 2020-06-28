@@ -62,7 +62,7 @@ class ICUEnvironment():
         self.__manager_agent_interfaces: dict = {}
         self.__server_socket: socket
         self.__init_server()
-        self.__icu: ICUApplicationSimulator = ICUApplicationSimulator(verbose=True)
+        self.__icu: ICUApplicationSimulator = ICUApplicationSimulator(verbose=False)
         self.__icu.start()
         self.__build_agents()
         self.__agent_listeners: List[ICUAgentListener] = []
@@ -115,7 +115,9 @@ class ICUEnvironment():
         event_generator_groups: dict = self.__config["systems"]
 
         for k, v in event_generator_groups.items():
-            agent: ICUManagerAgent = build_manager_agent(managed_group=k, managed_group_info=v, env_interface=(self.__config["environment"]["env_hostname"], self.__config["environment"]["env_port"]))
+            env_interface: tuple = (self.__config["environment"]["env_hostname"], self.__config["environment"]["env_port"])
+            verbose: bool = self.__config["environment"]["verbose_agents"]
+            agent: ICUManagerAgent = build_manager_agent(managed_group=k, managed_group_info=v, env_interface=env_interface, verbose=verbose)
             self.__manager_agents.append(agent)
 
             # Note: there is no race condition here, because the agent will indefinitely retry to connect upon failure.

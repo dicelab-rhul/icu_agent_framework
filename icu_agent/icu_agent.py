@@ -49,9 +49,10 @@ class ICUAbstractAgent():
 
 
 class ICUManagerAgent(ICUAbstractAgent):
-    def __init__(self, mind: ICUTeleoreactiveMind, actuators: list, sensors: list, env_hostname: str, env_port: int):
+    def __init__(self, mind: ICUTeleoreactiveMind, actuators: list, sensors: list, env_hostname: str, env_port: int, verbose=False):
         super().__init__(mind=mind)
 
+        self.__verbose: bool = verbose
         self.__finished: bool = False
         self.__env_hostname: str = env_hostname
         self.__env_port: int = env_port
@@ -144,7 +145,9 @@ class ICUManagerAgent(ICUAbstractAgent):
             if raw == "":
                 done = True
             else:
-                print("Agent {} (managing {}): received {}".format(self.get_id(), self.get_managed_group(), raw))
+                if self.__verbose:
+                    print("Agent {} (managing {}): received {}".format(self.get_id(), self.get_managed_group(), raw))
+                
                 perception: dict = loads(raw)
                 percept: ICURawPerception = ICURawPerception(raw_perception_data=perception["data"], perception_metadata=perception["metadata"])
 
