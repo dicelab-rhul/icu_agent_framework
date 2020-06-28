@@ -49,11 +49,11 @@ class ICUAgentListener(Process):
 
     def run(self) -> None:
         try:
-            print("RUN AGENT")
             super().run()
         except KeyboardInterrupt:
             print("Agent listener: killed by a keyboard interrupt.")
         except Exception as e:
+            raise e
             print("Agent listener: killed by {}.".format(e))
 
 class ICUEnvironment():
@@ -137,14 +137,14 @@ class ICUEnvironment():
             agent_listener.start()
 
     def __forward_feedback(self, agent_interface: socket):
-        while self.__icu.get_proc().is_alive():
+        while True:
             raw: str = read_utf8_str(s=agent_interface)
             feedback: dict = loads(s=raw)["details"]
 
             self.__icu.push_feedback(feedback=feedback)
 
     def __pull_and_dispatch(self) -> None:
-        while self.__icu.get_proc().is_alive():
+        while True:
             event: Event = self.__icu.get_event()
             event_generator_group: str = self.__get_event_generator_group(src=event.src, dst=event.dst)
 
