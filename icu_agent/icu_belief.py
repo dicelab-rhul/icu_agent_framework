@@ -40,17 +40,18 @@ class ICUBelief():
         
     def register_new_perception(self, perception_data: dict, perception_metdata: dict) -> None:
         if perception_metdata and perception_data:
-            if self.__is_event_speech(metadata=perception_metdata):
+            self.__latest_perception_metadata = perception_metdata
+
+            if self.__is_event_speech():
                 speech: dict = {k: v for k, v in perception_data.items()}
                 speech["message"] = perception_data["message"]
 
                 self.__latest_perception_messages.append(speech)
             else:
                 self.__latest_perception_data = perception_data
-                self.__latest_perception_metadata = perception_metdata
 
-    def __is_event_speech(self, metadata: dict) -> bool:
-        return "event" in metadata.keys() and metadata["event"] == "speech"
+    def __is_event_speech(self) -> bool:
+        return "event" in self.__latest_perception_metadata.keys() and self.__latest_perception_metadata["event"] == "speech"
 
     def reason(self) -> None:
         self._update_current_state()
@@ -96,6 +97,7 @@ class ICUBelief():
     def grace_period_expired(self) -> bool:
         return time() > self.__non_compliant_since + self.__grace_period_ns
 
+    # TODO: I am not sure this method works as intended.
     def is_user_looking(self) -> bool:
         x, y = self._user_eyes_location
 

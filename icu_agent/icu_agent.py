@@ -8,7 +8,6 @@ from time import sleep
 
 from icu_agent.icu_agent_mind import ICUTeleoreactiveMind
 from icu_agent.icu_actions import ICUAction
-from icu_agent.icu_perception import ICURawPerception
 from icu_socket_utils import read_utf8_str, send_utf8_str
 
 
@@ -120,7 +119,7 @@ class ICUManagerAgent(ICUAbstractAgent):
 
         if action != None:
             self.execute(action=action)
-        else:
+        elif self.__verbose:
             print("idle")
 
     def __begin_new_cycle(self, cycle_number: int) -> int:
@@ -149,9 +148,8 @@ class ICUManagerAgent(ICUAbstractAgent):
                     print("Agent {} (managing {}): received {}".format(self.get_id(), self.get_managed_group(), raw))
                 
                 perception: dict = loads(raw)
-                percept: ICURawPerception = ICURawPerception(raw_perception_data=perception["data"], perception_metadata=perception["metadata"])
-
-                self.get_mind().perceive(perception=percept)
+                
+                self.get_mind().perceive(perception=perception)
 
     def get_listening_interface(self) -> socket:
         return self.__sensors[0].interface()

@@ -102,11 +102,13 @@ class ICUEnvironment():
             s: socket = socket(AF_INET, SOCK_STREAM)
             s.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
             s.bind((self.__config["environment"]["env_binding_address"], self.__config["environment"]["env_port"]))
-            s.listen(4)
+            s.listen(4) # TODO: magic number.
 
             self.__server_socket = s
 
             print("Environment started.\n")
+        except KeyboardInterrupt:
+            print("Main environment process: killed by a keyboard interrupt.")
         except IOError as e:
             self.__clean_exit()
             print("Main environment process: killed by {}.".format(e))
