@@ -53,7 +53,6 @@ class ICUAgentListener(Process):
         except KeyboardInterrupt:
             print("Agent listener: killed by a keyboard interrupt.")
         except Exception as e:
-            raise e
             print("Agent listener: killed by {}.".format(e))
 
 class ICUEnvironment():
@@ -139,6 +138,10 @@ class ICUEnvironment():
     def __forward_feedback(self, agent_interface: socket):
         while True:
             raw: str = read_utf8_str(s=agent_interface)
+            
+            if raw is None or raw == "":
+                continue
+
             feedback: dict = loads(s=raw)["details"]
 
             self.__icu.push_feedback(feedback=feedback)
