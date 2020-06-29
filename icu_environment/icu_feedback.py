@@ -9,7 +9,7 @@ def arrow(agent_id: str, dst:str="Overlay:0"):
 
 class ICUFeedback():
     def __init__(self, agent_id: str, dst: list, data: dict):
-        self._feedback: dict = {"src": agent_id, "dst": {"name": d for d in dst}, "data": data}
+        self._feedback: dict = {"src": agent_id, "dst": dst, "data": data}
 
     def get(self) -> dict:
         return self._feedback
