@@ -48,16 +48,16 @@ class ICUTeleoreactiveMind():
         '''
         raise ICUAbstractMethodException()
 
-    def _consider_sending_feedback(self, belief: ICUBelief, goal: ICUMindGoal) -> None:
+    def _consider_sending_feedback(self, belief: ICUBelief, goal: ICUMindGoal, dst: list=[]) -> None:
         if not belief.is_user_looking():
-            self._generate_and_send_feedback(goal=goal)
+            self._generate_and_send_feedback(goal=goal, dst=dst)
         elif belief.grace_period_expired():
-            self._generate_and_send_feedback(goal=goal)
+            self._generate_and_send_feedback(goal=goal, dst=dst)
         else:
             goal.stay_idle()
 
-    def _generate_and_send_feedback(self, goal: ICUMindGoal) -> None:
-        self.__working_memory.get_belief().generate_feedback()
+    def _generate_and_send_feedback(self, goal: ICUMindGoal, dst: list) -> None:
+        self.__working_memory.get_belief().generate_feedback(dst=dst)
 
         feedback: dict = self.__working_memory.get_belief().get_next_feedback().get()
 
@@ -97,17 +97,18 @@ class ICUTrackingWidgetMind(ICUTeleoreactiveMind):
     def decide(self) -> None:
         belief: ICUTrackingWidgetBelief = self._cast_belief(belief=self.get_working_memory().get_belief(), real_type=ICUTrackingWidgetBelief)
         goal: ICUMindGoal = self.get_working_memory().get_goal()
+        dst: list = ["Target:0"]
 
         if belief.is_visual_indicator_already_on():
             goal.stay_idle()
         elif belief.is_x_too_small():
-            self._consider_sending_feedback(belief=belief, goal=goal)
+            self._consider_sending_feedback(belief=belief, goal=goal, dst=dst)
         elif belief.is_x_too_big():
-            self._consider_sending_feedback(belief=belief, goal=goal)
+            self._consider_sending_feedback(belief=belief, goal=goal, dst=dst)
         elif belief.is_y_too_small():
-            self._consider_sending_feedback(belief=belief, goal=goal)
+            self._consider_sending_feedback(belief=belief, goal=goal, dst=dst)
         elif belief.is_y_too_big():
-            self._consider_sending_feedback(belief=belief, goal=goal)
+            self._consider_sending_feedback(belief=belief, goal=goal, dst=dst)
         else:
            goal.stay_idle()
 
@@ -123,9 +124,9 @@ class ICUScaleMind(ICUTeleoreactiveMind):
         if belief.is_visual_indicator_already_on():
             goal.stay_idle()
         elif belief.is_too_high():
-            self._consider_sending_feedback(belief=belief, goal=goal)
+            self._consider_sending_feedback(belief=belief, goal=goal, dst=belief.get_all_scales_with_too_high_level())
         elif belief.is_too_low():
-            self._consider_sending_feedback(belief=belief, goal=goal)
+            self._consider_sending_feedback(belief=belief, goal=goal,  dst=belief.get_all_scales_with_too_low_level())
         else:
             goal.stay_idle()
 
@@ -141,7 +142,7 @@ class ICUPumpMind(ICUTeleoreactiveMind):
         if belief.is_visual_indicator_already_on():
             goal.stay_idle()
         elif belief.is_level_unacceptable():
-            self._consider_sending_feedback(belief=belief, goal=goal)
+            self._consider_sending_feedback(belief=belief, goal=goal, dst=belief.get_tanks_with_unacceptable_level())
         else:
             goal.stay_idle()
 
@@ -157,8 +158,8 @@ class ICUWarningLightMind(ICUTeleoreactiveMind):
         if belief.is_visual_indicator_already_on():
             goal.stay_idle()
         elif belief.is_red_light_on():
-            self._consider_sending_feedback(belief=belief, goal=goal)
+            self._consider_sending_feedback(belief=belief, goal=goal, dst=["WarningLight:1"])
         elif belief.is_green_light_off():
-            self._consider_sending_feedback(belief=belief, goal=goal)
+            self._consider_sending_feedback(belief=belief, goal=goal, dst=["WarningLight:0"])
         else:
             goal.stay_idle()

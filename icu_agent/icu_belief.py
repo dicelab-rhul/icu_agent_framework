@@ -76,8 +76,10 @@ class ICUBelief():
     def _update_current_state(self) -> None:
         raise ICUAbstractMethodException()
 
-    def generate_feedback(self) -> None:
-        raise ICUAbstractMethodException()
+    def generate_feedback(self, dst: list) -> None:
+        agent_id: str = self.get_agent_id()
+        feedback = highlight(agent_id=agent_id, dst=dst)
+        self._set_next_feedback(feedback)
 
     def _set_next_feedback(self, feedback: ICUFeedback) -> None:
         self.__next_feedback = feedback
@@ -134,9 +136,6 @@ class ICUWarningLightBelief(ICUBelief):
         if latest_perception_data is None or len(latest_perception_data.keys()) == 0: # We do not need to change the state.
             return
 
-        if "metadata" not in latest_perception_metadata:
-            print(latest_perception_metadata)
-
         # TODO: I am not sure this works as intended (i.e., what does the highlight event represent?)
         if latest_perception_metadata["src"] == "highlight":
             self._visual_indicator_on = not self._visual_indicator_on
@@ -156,13 +155,6 @@ class ICUWarningLightBelief(ICUBelief):
                 self._current_state["green_light"] = "on"
             elif src == "WarningLight:1": # green light
                 self._current_state["red_light"] = "off"
-
-
-    def generate_feedback(self) -> None:
-        agent_id: str = self.get_agent_id()
-        target: str = self._managed_group
-        feedback = highlight(agent_id, target)
-        self._set_next_feedback(feedback)
 
 class ICUScaleBelief(ICUBelief):
     def __init__(self, agent_id: str,  managed_group: str, managed_group_info: dict):
@@ -191,15 +183,30 @@ class ICUScaleBelief(ICUBelief):
     def is_out_of_bounds(self) -> bool:
         return self.is_too_high() or self.is_too_low()
 
+    def get_all_scales_with_too_high_level(self) -> list:
+        scales: list = []
+
+        for scale in filter(lambda k: "Scale" in k, self._current_state):
+            if self._current_state[scale]["state"] > 0: # TODO: I am not sure this is the right condition.
+                scales.append(scale)
+
+        return scales
+
+    def get_all_scales_with_too_low_level(self) -> list:
+        scales: list = []
+
+        for scale in filter(lambda k: "Scale" in k, self._current_state):
+            if self._current_state[scale]["state"] < 0: # TODO: I am not sure this is the right condition.
+                scales.append(scale)
+
+        return scales
+
     def _update_current_state(self) -> None:
         latest_perception_metadata: dict = self.get_latest_perception_metadata()
         latest_perception_data: dict = self.get_latest_perception_data()
 
         if latest_perception_data is None or len(latest_perception_data.keys()) == 0: # We do not need to change the state.
             return
-
-        if "metadata" not in latest_perception_metadata:
-            print(latest_perception_metadata)
 
         # TODO: I am not sure this works as intended (i.e., what does the highlight event represent?)
         if latest_perception_metadata["src"] == "highlight":
@@ -214,13 +221,6 @@ class ICUScaleBelief(ICUBelief):
             self._current_state[src]["state"] += perception_data["slide"]
         elif perception_data["label"] == "click":
             self._current_state[src]["state"] = 0
-
-    def generate_feedback(self) -> None:
-        agent_id: str = self.get_agent_id()
-        target: str = self._managed_group
-        feedback = highlight(agent_id, target)
-        self._set_next_feedback(feedback)
-
 
 class ICUPumpBelief(ICUBelief):
     def __init__(self, agent_id: str, managed_group: str, managed_group_info: dict):
@@ -239,15 +239,15 @@ class ICUPumpBelief(ICUBelief):
 
         return False
 
+    def get_tanks_with_unacceptable_level(self) -> list:
+        return [filter(lambda tank: self._current_state["tanks"][tank]["state_matters"], self._current_state["tanks"])]
+
     def _update_current_state(self) -> None:
         latest_perception_metadata: dict = self.get_latest_perception_metadata()
         latest_perception_data: dict = self.get_latest_perception_data()
 
         if latest_perception_data is None or len(latest_perception_data.keys()) == 0: # We do not need to change the state.
             return
-
-        if "metadata" not in latest_perception_metadata:
-            print(latest_perception_metadata)
 
         # TODO: I am not sure this works as intended (i.e., what does the highlight event represent?)
         if latest_perception_metadata["src"] == "highlight":
@@ -263,13 +263,6 @@ class ICUPumpBelief(ICUBelief):
                  self._current_state[src]["state"] = "acceptable"
             elif perception_data["acceptable"] == "no":
                 self._current_state[src]["state"] = "unacceptable"
-
-    def generate_feedback(self) -> None:
-        agent_id: str = self.get_agent_id()
-        target: str = self._managed_group
-        feedback = highlight(agent_id, target)
-        self._set_next_feedback(feedback)
-
 
 class ICUTrackingWidgetBelief(ICUBelief):
     def __init__(self, agent_id: str, managed_group: str, managed_group_info: dict):
@@ -317,9 +310,6 @@ class ICUTrackingWidgetBelief(ICUBelief):
         if latest_perception_data is None or len(latest_perception_data.keys()) == 0: # We do not need to change the state.
             return
 
-        if "metadata" not in latest_perception_metadata:
-            print(latest_perception_metadata)
-
         # TODO: I am not sure this works as intended (i.e., what does the highlight event represent?)
         if latest_perception_metadata["src"] == "highlight":
             self._visual_indicator_on = not self._visual_indicator_on
@@ -332,12 +322,6 @@ class ICUTrackingWidgetBelief(ICUBelief):
         if perception_data["label"] == "move":
             self._current_state["target"]["state"]["x"] += perception_data["dx"]
             self._current_state["target"]["state"]["y"] += perception_data["dy"]
-
-    def generate_feedback(self) -> None:
-        agent_id: str = self.get_agent_id()
-        target: str = self._managed_group
-        feedback = highlight(agent_id, target)
-        self._set_next_feedback(feedback)
 
 def build_icu_belief(agent_id: str, managed_group: str, managed_group_info: dict) -> ICUBelief:
     if managed_group == "scales":
