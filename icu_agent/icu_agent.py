@@ -5,6 +5,8 @@ from json import loads
 from multiprocessing import Process
 from typing import Optional, Callable, Any
 from time import sleep
+from os import kill as kill_process
+from signal import SIGKILL
 
 from icu_agent.icu_agent_mind import ICUTeleoreactiveMind
 from icu_agent.icu_actions import ICUAction
@@ -28,6 +30,11 @@ class ICUAgentProcess(Process):
             print("{} process: killed by a keyboard interrupt.".format(self.__agent_id))
         except Exception as e:
             print("{} {} (managing {}): stopped due to {}.".format(type(self).__name__, self.__agent_id, self.__managed_generator, e))
+
+    def kill(self) -> None:
+        # Python < 3.7 does not have multiprocess.Process.kill()
+        if self.pid != None:
+            kill_process(self.pid, SIGKILL)
 
 
 class ICUAbstractAgent():

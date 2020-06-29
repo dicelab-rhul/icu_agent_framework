@@ -4,6 +4,8 @@ from typing import List, Iterator
 from multiprocessing import  Process
 from socket import socket, AF_INET, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
 from json import dumps, loads
+from os import kill as kill_process
+from signal import SIGKILL
 
 from icu_agent.icu_agent import ICUManagerAgent
 from icu_agent.icu_agent_factory import build_manager_agent
@@ -43,6 +45,11 @@ class ICUEnvironmentDispatcher(Process):
         except Exception as e:
             print("Event dispatcher: killed by {}.".format(e))
 
+    def kill(self) -> None:
+        # Python < 3.7 does not have multiprocess.Process.kill()
+        if self.pid != None:
+            kill_process(self.pid, SIGKILL)
+
 class ICUAgentListener(Process):
     def __init__(self, target, args=[]):
         super().__init__(target=target, args=args, group=None)
@@ -54,6 +61,11 @@ class ICUAgentListener(Process):
             print("Agent listener: killed by a keyboard interrupt.")
         except Exception as e:
             print("Agent listener: killed by {}.".format(e))
+
+    def kill(self) -> None:
+        # Python < 3.7 does not have multiprocess.Process.kill()
+        if self.pid != None:
+            kill_process(self.pid, SIGKILL)
 
 class ICUEnvironment():
     def __init__(self, config: dict) -> None:
