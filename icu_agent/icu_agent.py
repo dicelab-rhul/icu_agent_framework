@@ -29,6 +29,7 @@ class ICUAgentProcess(Process):
         except KeyboardInterrupt:
             print("{} process: killed by a keyboard interrupt.".format(self.__agent_id))
         except Exception as e:
+            raise e
             print("{} {} (managing {}): stopped due to {}.".format(type(self).__name__, self.__agent_id, self.__managed_generator, e))
 
     def kill(self) -> None:
@@ -114,6 +115,7 @@ class ICUManagerAgent(ICUAbstractAgent):
             print("Agent {}: killed by a keyboard interrupt.".format(self.get_id()))
         except Exception as e:
             self.__env_socket.close()
+            raise e
             print("Agent {}: killed by {}.".format(self.get_id(), e))
 
     def __cycle_step(self, cycle_number: int) -> None:

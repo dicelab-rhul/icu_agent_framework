@@ -128,29 +128,33 @@ class ICUWarningLightBelief(ICUBelief):
         return self._current_state["green_light"]["state"] == "off"
 
     def _update_current_state(self) -> None:
-        latest_perception: dict = self.get_latest_perception_data()
+        latest_perception_metadata: dict = self.get_latest_perception_metadata()
+        latest_perception_data: dict = self.get_latest_perception_data()
 
-        if latest_perception is None or len(latest_perception.keys()) == 0: # We do not need to change the state.
+        if latest_perception_data is None or len(latest_perception_data.keys()) == 0: # We do not need to change the state.
             return
 
-        # TODO: I am not sure this works as intended (i.e., what does the highlight event represent?)
-        if latest_perception["metadata"]["src"] == "highlight":
-            self._visual_indicator_on = not self._visual_indicator_on
-        elif latest_perception["metadata"]["src"] == "eye_tracker":
-            self._user_eyes_location = latest_perception["data"]["x"], latest_perception["data"]["y"]
-        elif latest_perception["metadata"]["src"] == "warning_lights":
-            self.__update_lights(perception_data=latest_perception["data"])
+        if "metadata" not in latest_perception_metadata:
+            print(latest_perception_metadata)
 
-    def __update_lights(self, perception_data: dict) -> None:
+        # TODO: I am not sure this works as intended (i.e., what does the highlight event represent?)
+        if latest_perception_metadata["src"] == "highlight":
+            self._visual_indicator_on = not self._visual_indicator_on
+        elif latest_perception_metadata["src"] == "eye_tracker":
+            self._user_eyes_location = latest_perception_data["data"]["x"], latest_perception_data["data"]["y"]
+        elif latest_perception_metadata["src"] == "warning_lights":
+            self.__update_lights(perception_data=latest_perception_data["data"], src=latest_perception_metadata["src"])
+
+    def __update_lights(self, perception_data: dict, src: str) -> None:
         if perception_data["label"] == "switch":
-            if perception_data["src"] == "WarningLight:0": # green light
+            if src == "WarningLight:0": # green light
                 self._current_state["green_light"] = "off"
-            elif perception_data["src"] == "WarningLight:1": # green light
+            elif src == "WarningLight:1": # green light
                 self._current_state["red_light"] = "on"
         elif perception_data["label"] == "click":
-            if perception_data["src"] == "WarningLight:0": # green light
+            if src == "WarningLight:0": # green light
                 self._current_state["green_light"] = "on"
-            elif perception_data["src"] == "WarningLight:1": # green light
+            elif src == "WarningLight:1": # green light
                 self._current_state["red_light"] = "off"
 
 
@@ -188,26 +192,28 @@ class ICUScaleBelief(ICUBelief):
         return self.is_too_high() or self.is_too_low()
 
     def _update_current_state(self) -> None:
-        latest_perception: dict = self.get_latest_perception_data()
+        latest_perception_metadata: dict = self.get_latest_perception_metadata()
+        latest_perception_data: dict = self.get_latest_perception_data()
 
-        if latest_perception is None or len(latest_perception.keys()) == 0: # We do not need to change the state.
+        if latest_perception_data is None or len(latest_perception_data.keys()) == 0: # We do not need to change the state.
             return
 
+        if "metadata" not in latest_perception_metadata:
+            print(latest_perception_metadata)
+
         # TODO: I am not sure this works as intended (i.e., what does the highlight event represent?)
-        if latest_perception["metadata"]["src"] == "highlight":
+        if latest_perception_metadata["src"] == "highlight":
             self._visual_indicator_on = not self._visual_indicator_on
-        elif latest_perception["metadata"]["src"] == "eye_tracker":
-            self._user_eyes_location = latest_perception["data"]["x"], latest_perception["data"]["y"]
-        elif latest_perception["metadata"]["src"] == "scales":
-            self.__update_scales(perception_data=latest_perception["data"])
+        elif latest_perception_metadata["src"] == "eye_tracker":
+            self._user_eyes_location = latest_perception_data["data"]["x"], latest_perception_data["data"]["y"]
+        elif latest_perception_metadata["src"] == "scales":
+            self.__update_scales(perception_data=latest_perception_data["data"], src=latest_perception_metadata["src"])
 
-    def __update_scales(self, perception_data: dict) -> None:
-        scale: str = perception_data["src"]
-
+    def __update_scales(self, perception_data: dict, src: str) -> None:
         if perception_data["label"] == "slide":
-            self._current_state[scale]["state"] += perception_data["slide"]
+            self._current_state[src]["state"] += perception_data["slide"]
         elif perception_data["label"] == "click":
-            self._current_state[scale]["state"] = 0
+            self._current_state[src]["state"] = 0
 
     def generate_feedback(self) -> None:
         agent_id: str = self.get_agent_id()
@@ -234,25 +240,29 @@ class ICUPumpBelief(ICUBelief):
         return False
 
     def _update_current_state(self) -> None:
-        latest_perception: dict = self.get_latest_perception_data()
+        latest_perception_metadata: dict = self.get_latest_perception_metadata()
+        latest_perception_data: dict = self.get_latest_perception_data()
 
-        if latest_perception is None or len(latest_perception.keys()) == 0: # We do not need to change the state.
+        if latest_perception_data is None or len(latest_perception_data.keys()) == 0: # We do not need to change the state.
             return
 
-        # TODO: I am not sure this works as intended (i.e., what does the highlight event represent?)
-        if latest_perception["metadata"]["src"] == "highlight":
-            self._visual_indicator_on = not self._visual_indicator_on
-        elif latest_perception["metadata"]["src"] == "eye_tracker":
-            self._user_eyes_location = latest_perception["data"]["x"], latest_perception["data"]["y"]
-        elif latest_perception["metadata"]["src"] == "pumps_and_tanks":
-            self.__update_tanks(perception_data=latest_perception["data"])
+        if "metadata" not in latest_perception_metadata:
+            print(latest_perception_metadata)
 
-    def __update_tanks(self, perception_data: dict) -> None:
+        # TODO: I am not sure this works as intended (i.e., what does the highlight event represent?)
+        if latest_perception_metadata["src"] == "highlight":
+            self._visual_indicator_on = not self._visual_indicator_on
+        elif latest_perception_metadata["src"] == "eye_tracker":
+            self._user_eyes_location = latest_perception_data["data"]["x"], latest_perception_data["data"]["y"]
+        elif latest_perception_metadata["src"] == "pumps_and_tanks":
+            self.__update_tanks(perception_data=latest_perception_data["data"], src=latest_perception_metadata["src"])
+
+    def __update_tanks(self, perception_data: dict, src: str) -> None:
         if perception_data["label"] == "fuel":
             if perception_data["acceptable"] == "yes": # TODO: I am not sure the label semantics is correct.
-                 self._current_state[perception_data["src"]]["state"] = "acceptable"
+                 self._current_state[src]["state"] = "acceptable"
             elif perception_data["acceptable"] == "no":
-                self._current_state[perception_data["src"]]["state"] = "unacceptable"
+                self._current_state[src]["state"] = "unacceptable"
 
     def generate_feedback(self) -> None:
         agent_id: str = self.get_agent_id()
@@ -301,18 +311,22 @@ class ICUTrackingWidgetBelief(ICUBelief):
         return self.is_x_out_of_bounds() or self.is_y_out_of_bounds()
 
     def _update_current_state(self) -> None:
-        latest_perception: dict = self.get_latest_perception_data()
+        latest_perception_metadata: dict = self.get_latest_perception_metadata()
+        latest_perception_data: dict = self.get_latest_perception_data()
 
-        if latest_perception is None or len(latest_perception.keys()) == 0: # We do not need to change the state.
+        if latest_perception_data is None or len(latest_perception_data.keys()) == 0: # We do not need to change the state.
             return
 
+        if "metadata" not in latest_perception_metadata:
+            print(latest_perception_metadata)
+
         # TODO: I am not sure this works as intended (i.e., what does the highlight event represent?)
-        if latest_perception["metadata"]["src"] == "highlight":
+        if latest_perception_metadata["src"] == "highlight":
             self._visual_indicator_on = not self._visual_indicator_on
-        elif latest_perception["metadata"]["src"] == "eye_tracker":
-            self._user_eyes_location = latest_perception["data"]["x"], latest_perception["data"]["y"]
-        elif latest_perception["metadata"]["src"] == "tracking_widget":
-            self.__update_target(perception_data=latest_perception["data"])
+        elif latest_perception_metadata["src"] == "eye_tracker":
+            self._user_eyes_location = latest_perception_data["data"]["x"], latest_perception_data["data"]["y"]
+        elif latest_perception_metadata["src"] == "tracking_widget":
+            self.__update_target(perception_data=latest_perception_data["data"])
 
     def __update_target(self, perception_data: dict) -> None:
         if perception_data["label"] == "move":
