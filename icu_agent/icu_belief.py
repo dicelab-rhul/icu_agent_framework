@@ -7,7 +7,7 @@ if version_info.major + version_info.minor / 10 < 3.7:
 else:
     from time import time_ns as time
 
-from icu_environment.icu_feedback import ICUFeedback
+from icu_environment.icu_feedback import ICUFeedback, highlight
 from icu_exceptions import ICUException, ICUAbstractMethodException
 
 
@@ -157,9 +157,8 @@ class ICUWarningLightBelief(ICUBelief):
     def generate_feedback(self) -> None:
         agent_id: str = self.get_agent_id()
         target: str = self._managed_group
-
-        self._set_next_feedback(ICUFeedback(agent_id=agent_id, dst=target))
-
+        feedback = highlight(agent_id, target)
+        self._set_next_feedback(feedback)
 
 class ICUScaleBelief(ICUBelief):
     def __init__(self, agent_id: str,  managed_group: str, managed_group_info: dict):
@@ -213,8 +212,8 @@ class ICUScaleBelief(ICUBelief):
     def generate_feedback(self) -> None:
         agent_id: str = self.get_agent_id()
         target: str = self._managed_group
-
-        self._set_next_feedback(ICUFeedback(agent_id=agent_id, dst=target))
+        feedback = highlight(agent_id, target)
+        self._set_next_feedback(feedback)
 
 
 class ICUPumpBelief(ICUBelief):
@@ -258,8 +257,8 @@ class ICUPumpBelief(ICUBelief):
     def generate_feedback(self) -> None:
         agent_id: str = self.get_agent_id()
         target: str = self._managed_group
-
-        self._set_next_feedback(ICUFeedback(agent_id=agent_id, dst=target))
+        feedback = highlight(agent_id, target)
+        self._set_next_feedback(feedback)
 
 
 class ICUTrackingWidgetBelief(ICUBelief):
@@ -323,9 +322,8 @@ class ICUTrackingWidgetBelief(ICUBelief):
     def generate_feedback(self) -> None:
         agent_id: str = self.get_agent_id()
         target: str = self._managed_group
-
-        self._set_next_feedback(ICUFeedback(agent_id=agent_id, dst=target))
-
+        feedback = highlight(agent_id, target)
+        self._set_next_feedback(feedback)
 
 def build_icu_belief(agent_id: str, managed_group: str, managed_group_info: dict) -> ICUBelief:
     if managed_group == "scales":
