@@ -11,10 +11,11 @@ from icu_exceptions import ICUAbstractMethodException
 
 
 class ICUTeleoreactiveMind():
-    def __init__(self, managed_group: str, managed_group_info: dict, storage: ICUMindStorage):
+    def __init__(self, managed_group: str, managed_group_info: dict, storage: ICUMindStorage, backup_previous_perceptions: bool):
         self.__id = str(uuid4())
         self.__storage: ICUMindStorage = storage
         self.__working_memory: ICUMindWorkingMemory = self.__init_working_memory(managed_group=managed_group, managed_group_info=managed_group_info)
+        self.__backup_previous_perceptions: bool = backup_previous_perceptions
 
     def __init_working_memory(self, managed_group: str, managed_group_info: dict) -> ICUMindWorkingMemory:
         belief: ICUBelief = build_icu_belief(agent_id=self.__id, managed_group=managed_group, managed_group_info=managed_group_info)
@@ -34,7 +35,9 @@ class ICUTeleoreactiveMind():
         '''
         Backs up the current perception for the future, and updates the mind belief.
         '''
-        self.__backup_current_perception() # TODO: do we really need this? The RAM explodes really fast with eye traking data.
+        if self.__backup_previous_perceptions:
+            self.__backup_current_perception()
+        
         self.__working_memory.get_belief().reason()
 
     def __backup_current_perception(self) -> None:
@@ -91,8 +94,8 @@ class ICUTeleoreactiveMind():
 
 
 class ICUTrackingWidgetMind(ICUTeleoreactiveMind):
-    def __init__(self, managed_group, managed_group_info, storage):
-        super().__init__(managed_group, managed_group_info, storage)
+    def __init__(self, managed_group, managed_group_info, storage, backup_previous_perceptions):
+        super().__init__(managed_group, managed_group_info, storage, backup_previous_perceptions)
 
     def decide(self) -> None:
         belief: ICUTrackingWidgetBelief = self._cast_belief(belief=self.get_working_memory().get_belief(), real_type=ICUTrackingWidgetBelief)
@@ -114,8 +117,8 @@ class ICUTrackingWidgetMind(ICUTeleoreactiveMind):
 
 
 class ICUScaleMind(ICUTeleoreactiveMind):
-    def __init__(self, managed_group, managed_group_info, storage):
-        super().__init__(managed_group, managed_group_info, storage)
+    def __init__(self, managed_group, managed_group_info, storage, backup_previous_perceptions):
+        super().__init__(managed_group, managed_group_info, storage, backup_previous_perceptions)
 
     def decide(self) -> None:
         belief: ICUScaleBelief = self._cast_belief(belief=self.get_working_memory().get_belief(), real_type=ICUScaleBelief)
@@ -132,8 +135,8 @@ class ICUScaleMind(ICUTeleoreactiveMind):
 
 
 class ICUPumpMind(ICUTeleoreactiveMind):
-    def __init__(self, managed_group, managed_group_info, storage):
-        super().__init__(managed_group, managed_group_info, storage)
+    def __init__(self, managed_group, managed_group_info, storage, backup_previous_perceptions):
+        super().__init__(managed_group, managed_group_info, storage, backup_previous_perceptions)
 
     def decide(self) -> None:
         belief: ICUPumpBelief = self._cast_belief(belief=self.get_working_memory().get_belief(), real_type=ICUPumpBelief)
@@ -148,8 +151,8 @@ class ICUPumpMind(ICUTeleoreactiveMind):
 
 
 class ICUWarningLightMind(ICUTeleoreactiveMind):
-    def __init__(self, managed_group, managed_group_info, storage):
-        super().__init__(managed_group, managed_group_info, storage)
+    def __init__(self, managed_group, managed_group_info, storage, backup_previous_perceptions):
+        super().__init__(managed_group, managed_group_info, storage, backup_previous_perceptions)
 
     def decide(self) -> None:
         belief: ICUWarningLightBelief = self._cast_belief(belief=self.get_working_memory().get_belief(), real_type=ICUWarningLightBelief)
