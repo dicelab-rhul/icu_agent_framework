@@ -130,8 +130,9 @@ class ICUEnvironment():
 
         for k, v in event_generator_groups.items():
             env_interface: tuple = (self.__config["environment"]["env_hostname"], self.__config["environment"]["env_port"])
-            verbose: bool = self.__config["environment"]["verbose_agents"]
-            agent: ICUManagerAgent = build_manager_agent(managed_group=k, managed_group_info=v, env_interface=env_interface, verbose=verbose)
+            verbose: bool = self.__config["agents"]["verbose_agents"]
+            backup_previous_perceptions: bool = self.__config["agents"]["backup_previous_perceptions"]
+            agent: ICUManagerAgent = build_manager_agent(managed_group=k, managed_group_info=v, env_interface=env_interface, verbose=verbose, backup_previous_perceptions=backup_previous_perceptions)
             self.__manager_agents.append(agent)
 
             # Note: there is no race condition here, because the agent will indefinitely retry to connect upon failure.

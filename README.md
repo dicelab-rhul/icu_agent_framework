@@ -38,8 +38,8 @@ The agents, the dispatcher, and the feedback listeners all communicate via socke
 
 1) The configuration is loaded.
 2) The server socket (w.r.t. agents) is initialised.
-3) For each event generator group (see config file) a new agent is spawned.
-4) The ICU application simulator is created and booted, together with the eye tracker.
+3) The ICU application simulator is created and booted, together with the eye tracker.
+4) For each event generator group (see config file) a new agent is spawned.
 5) The agent listerner processes are created, one for each agent. They wait for feedback, and forward it to the ICU simulator
     - wait for feedback
     - send the received feedback to the ICU
