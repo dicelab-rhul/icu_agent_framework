@@ -118,6 +118,7 @@ class ICUWarningLightBelief(ICUBelief):
         return {generator: self._managed_group_info[generator] for generator in self._managed_event_generators}
 
     def is_red_light_on(self) -> bool:
+        print(self._current_state)
         return self._current_state["red_light"]["state"] == "on"
 
     def is_red_light_off(self) -> bool:
@@ -137,24 +138,24 @@ class ICUWarningLightBelief(ICUBelief):
             return
 
         # TODO: I am not sure this works as intended (i.e., what does the highlight event represent?)
-        if latest_perception_metadata["src"] == "highlight":
+        if latest_perception_metadata["src_group"] == "highlight":
             self._visual_indicator_on = not self._visual_indicator_on
-        elif latest_perception_metadata["src"] == "eye_tracker":
+        elif latest_perception_metadata["src_group"] == "eye_tracker":
             self._user_eyes_location = latest_perception_data["data"]["x"], latest_perception_data["data"]["y"]
-        elif latest_perception_metadata["src"] == "warning_lights":
+        elif latest_perception_metadata["src_group"] == "warning_lights":
             self.__update_lights(perception_data=latest_perception_data["data"], src=latest_perception_metadata["src"])
 
     def __update_lights(self, perception_data: dict, src: str) -> None:
         if perception_data["label"] == "switch":
             if src == "WarningLight:0": # green light
-                self._current_state["green_light"] = "off"
+                self._current_state["green_light"]["state"] = "off"
             elif src == "WarningLight:1": # green light
-                self._current_state["red_light"] = "on"
+                self._current_state["red_light"]["state"] = "on"
         elif perception_data["label"] == "click":
             if src == "WarningLight:0": # green light
-                self._current_state["green_light"] = "on"
+                self._current_state["green_light"]["state"] = "on"
             elif src == "WarningLight:1": # green light
-                self._current_state["red_light"] = "off"
+                self._current_state["red_light"]["state"] = "off"
 
 class ICUScaleBelief(ICUBelief):
     def __init__(self, agent_id: str,  managed_group: str, managed_group_info: dict):
@@ -207,11 +208,11 @@ class ICUScaleBelief(ICUBelief):
             return
 
         # TODO: I am not sure this works as intended (i.e., what does the highlight event represent?)
-        if latest_perception_metadata["src"] == "highlight":
+        if latest_perception_metadata["src_group"] == "highlight":
             self._visual_indicator_on = not self._visual_indicator_on
-        elif latest_perception_metadata["src"] == "eye_tracker":
+        elif latest_perception_metadata["src_group"] == "eye_tracker":
             self._user_eyes_location = latest_perception_data["data"]["x"], latest_perception_data["data"]["y"]
-        elif latest_perception_metadata["src"] == "scales":
+        elif latest_perception_metadata["src_group"] == "scales":
             self.__update_scales(perception_data=latest_perception_data["data"], src=latest_perception_metadata["src"])
 
     def __update_scales(self, perception_data: dict, src: str) -> None:
@@ -248,11 +249,11 @@ class ICUPumpBelief(ICUBelief):
             return
 
         # TODO: I am not sure this works as intended (i.e., what does the highlight event represent?)
-        if latest_perception_metadata["src"] == "highlight":
+        if latest_perception_metadata["src_group"] == "highlight":
             self._visual_indicator_on = not self._visual_indicator_on
-        elif latest_perception_metadata["src"] == "eye_tracker":
+        elif latest_perception_metadata["src_group"] == "eye_tracker":
             self._user_eyes_location = latest_perception_data["data"]["x"], latest_perception_data["data"]["y"]
-        elif latest_perception_metadata["src"] == "pumps_and_tanks":
+        elif latest_perception_metadata["src_group"] == "pumps_and_tanks":
             self.__update_tanks(perception_data=latest_perception_data["data"], src=latest_perception_metadata["src"])
 
     def __update_tanks(self, perception_data: dict, src: str) -> None:
@@ -309,11 +310,11 @@ class ICUTrackingWidgetBelief(ICUBelief):
             return
 
         # TODO: I am not sure this works as intended (i.e., what does the highlight event represent?)
-        if latest_perception_metadata["src"] == "highlight":
+        if latest_perception_metadata["src_group"] == "highlight":
             self._visual_indicator_on = not self._visual_indicator_on
-        elif latest_perception_metadata["src"] == "eye_tracker":
+        elif latest_perception_metadata["src_group"] == "eye_tracker":
             self._user_eyes_location = latest_perception_data["data"]["x"], latest_perception_data["data"]["y"]
-        elif latest_perception_metadata["src"] == "tracking_widget":
+        elif latest_perception_metadata["src_group"] == "tracking_widget":
             self.__update_target(perception_data=latest_perception_data["data"])
 
     def __update_target(self, perception_data: dict) -> None:

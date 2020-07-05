@@ -166,7 +166,7 @@ class ICUEnvironment():
             event: Event = self.__icu.get_event()
             event_generator_group: str = self.__get_event_generator_group(src=event.src, dst=event.dst)
 
-            if event_generator_group == "empty":
+            if event_generator_group == "empty" or event.dst == "global":
                 continue # i.e., discard the useless empty event, and get a new one.
             elif event_generator_group in ("eye_tracker", "highlight"):
                 self.__broadcast_event(event=event)
@@ -204,7 +204,7 @@ class ICUEnvironment():
         self.__notify_agent(managed_group=managed_group, perception_data=perception_data)
 
     def __build_perception_from_event(self, event_data: dict, managed_group: str) -> dict:
-        return {"data": event_data, "metadata": {"event": "pull", "success": True, "src": managed_group}}
+        return {"data": event_data, "metadata": {"event": "pull", "success": True, "src_group": managed_group, "src": event_data["dst"]}}
 
     def __notify_agent(self, managed_group: str, perception_data: dict) -> None:
         send_utf8_str(s=self.__manager_agent_interfaces[managed_group], content=dumps(perception_data))
