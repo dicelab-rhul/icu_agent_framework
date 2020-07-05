@@ -107,7 +107,7 @@ class ICUApplicationSimulator():
 
         to_send: Tuple = (feedback["src"], feedback["dst"], feedback["data"])
 
-        print("Sending {} to ICU.".format(feedback))
+        #print("Sending {} to ICU.".format(feedback))
 
         self.__source.source(src=to_send[0], dst=to_send[1], data=to_send[2])
 

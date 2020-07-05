@@ -151,8 +151,7 @@ class ICUManagerAgent(ICUAbstractAgent):
             if raw == "":
                 done = True
             else:
-                if self.__verbose:
-                    print("Agent {} (managing {}): received {}".format(self.get_id(), self.get_managed_group(), raw))
+                print("Agent {} (managing {}): received {}".format(self.get_id(), self.get_managed_group(), raw))
                 
                 perception: dict = loads(raw)
                 

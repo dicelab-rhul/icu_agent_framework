@@ -14,6 +14,8 @@ from icu_environment.icu_application_simulator import ICUApplicationSimulator
 
 from icu.event import Event
 
+VERBOSE = True
+
 '''
 Environment life cycle:
 
@@ -74,7 +76,7 @@ class ICUEnvironment():
         self.__manager_agent_interfaces: dict = {}
         self.__server_socket: socket
         self.__init_server()
-        self.__icu: ICUApplicationSimulator = ICUApplicationSimulator(verbose=False)
+        self.__icu: ICUApplicationSimulator = ICUApplicationSimulator(verbose=VERBOSE)
         self.__icu.start()
         self.__build_agents()
         self.__agent_listeners: List[ICUAgentListener] = []
