@@ -153,7 +153,6 @@ class ICUWarningLightBelief(ICUBelief):
             elif perception_data["src"] == "WarningLight:1": # green light
                 self._current_state["red_light"] = "off"
 
-
     def generate_feedback(self) -> None:
         agent_id: str = self.get_agent_id()
         target: str = self._managed_group
@@ -174,14 +173,12 @@ class ICUScaleBelief(ICUBelief):
         for scale in filter(lambda k: "Scale" in k, self._current_state):
             if self._current_state[scale]["state"] < 0: # TODO: I am not sure this is the right condition.
                 return True
-
         return False
 
     def is_too_high(self) -> bool:
         for scale in filter(lambda k: "Scale" in k, self._current_state):
             if self._current_state[scale]["state"] > 0: # TODO: I am not sure this is the right condition.
                 return True
-
         return False
 
     def is_out_of_bounds(self) -> bool:

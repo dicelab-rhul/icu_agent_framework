@@ -129,7 +129,6 @@ class ICUScaleMind(ICUTeleoreactiveMind):
         else:
             goal.stay_idle()
 
-
 class ICUPumpMind(ICUTeleoreactiveMind):
     def __init__(self, managed_group, managed_group_info, storage):
         super().__init__(managed_group, managed_group_info, storage)
@@ -144,7 +143,6 @@ class ICUPumpMind(ICUTeleoreactiveMind):
             self._consider_sending_feedback(belief=belief, goal=goal)
         else:
             goal.stay_idle()
-
 
 class ICUWarningLightMind(ICUTeleoreactiveMind):
     def __init__(self, managed_group, managed_group_info, storage):
