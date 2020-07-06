@@ -118,7 +118,6 @@ class ICUWarningLightBelief(ICUBelief):
         return {generator: self._managed_group_info[generator] for generator in self._managed_event_generators}
 
     def is_red_light_on(self) -> bool:
-        print(self._current_state)
         return self._current_state["red_light"]["state"] == "on"
 
     def is_red_light_off(self) -> bool:

@@ -11,6 +11,9 @@
         "env_port": 1890,
         "easter_egg": "the_port_number_sure_is_one"
     },
+    "icu": {
+        "verbose": false
+    },
     "agents": {
         "verbose_agents": false,
         "backup_previous_perceptions": false

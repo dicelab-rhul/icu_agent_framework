@@ -8,8 +8,6 @@ from time import sleep
 from os import kill as kill_process
 from signal import SIGKILL
 
-import traceback
-
 from icu_agent.icu_agent_mind import ICUTeleoreactiveMind
 from icu_agent.icu_actions import ICUAction
 from icu_socket_utils import read_utf8_str, send_utf8_str
@@ -114,10 +112,9 @@ class ICUManagerAgent(ICUAbstractAgent):
         except KeyboardInterrupt:
             self.__env_socket.close()
             print("Agent {}: killed by a keyboard interrupt.".format(self.get_id()))
-        except Exception as e:
+        except Exception:
             self.__env_socket.close()
             print("Agent {}: killed by exception:".format(self.get_id()))
-            traceback.print_exc()
 
     def __cycle_step(self, cycle_number: int) -> None:
         if cycle_number > 1:
@@ -141,8 +138,6 @@ class ICUManagerAgent(ICUAbstractAgent):
         return self.get_mind().get_working_memory().get_belief().get_managed_group()
 
     def execute(self, action: ICUAction) -> None:
-        #print("Agent {} (managing {}): sending {} to the env.".format(self.get_id(), self.get_managed_group(), type(action)))
-
         self.__actuators[0].attempt(action)
 
     def perceive(self) -> None:
@@ -151,7 +146,7 @@ class ICUManagerAgent(ICUAbstractAgent):
         while not done:
             raw: str = self.__sensors[0].perceive_one(timeout=1) # TODO: this is problematic. See TODO.md --> remove sockets.
 
-            if raw == "":
+            if raw == "" or not raw:
                 done = True
             else:
                 if self.__verbose:

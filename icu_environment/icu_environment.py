@@ -1,6 +1,6 @@
 __author__ = "cloudstrife9999"
 
-from typing import List, Iterator
+from typing import List
 from multiprocessing import  Process
 from socket import socket, AF_INET, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
 from json import dumps, loads
@@ -11,10 +11,9 @@ from icu_agent.icu_agent import ICUManagerAgent
 from icu_agent.icu_agent_factory import build_manager_agent
 from icu_socket_utils import send_utf8_str, read_utf8_str
 from icu_environment.icu_application_simulator import ICUApplicationSimulator
+from icu_exceptions import ICUInconsistentStateException
 
 from icu.event import Event
-
-VERBOSE = True
 
 '''
 Environment life cycle:
@@ -76,7 +75,7 @@ class ICUEnvironment():
         self.__manager_agent_interfaces: dict = {}
         self.__server_socket: socket
         self.__init_server()
-        self.__icu: ICUApplicationSimulator = ICUApplicationSimulator(verbose=VERBOSE)
+        self.__icu: ICUApplicationSimulator = ICUApplicationSimulator(verbose=self.__config["icu"]["verbose"])
         self.__icu.start()
         self.__build_agents()
         self.__agent_listeners: List[ICUAgentListener] = []
@@ -164,47 +163,101 @@ class ICUEnvironment():
     def __pull_and_dispatch(self) -> None:
         while True:
             event: Event = self.__icu.get_event()
-            event_generator_group: str = self.__get_event_generator_group(src=event.src, dst=event.dst)
+            event_metadata: dict = self.__get_event_metadata(event=event)
 
-            if event_generator_group == "empty" or event.dst == "global":
-                continue # i.e., discard the useless empty event, and get a new one.
-            elif event_generator_group in ("eye_tracker", "highlight"):
-                self.__broadcast_event(event=event)
+            if self.__is_event_useless(event_metadata=event_metadata):
+                continue
+
+            event_data: dict = event.serialise()
+
+            if event_metadata["src_group"] in ("eye_tracker", "highlight"):
+                self.__broadcast_event(event_data=event_data, event_metadata=event_metadata)
             else:
-                self.__notify_agent_with_event(managed_group=event_generator_group, event=event)
+                self.__notify_agent_with_event(event_data=event_data, event_metadata=event_metadata)
 
-    def __get_event_generator_group(self, src, dst) -> str:
-        if src == "empty":
+    def __is_event_useless(self, event_metadata: dict) -> bool:
+        return event_metadata["src_group"] in ["empty", "unknown", "eye_tracker"] #TODO: remove eye_tracker from this list  
+
+
+    def __get_event_metadata(self, event: Event) -> dict:
+        return {
+            "event": "pull",
+            "success": True,
+            "src_group": self.__get_event_src_group(event=event),
+            "src": self.__get_event_src(event=event)
+        }
+
+    def __get_event_src_group(self, event: Event) -> str:
+        if event.src == "empty":
             return "empty"
-        elif "Highlight" in src:
+        elif self.__is_highlighting_event(event=event):
             return "highlight"
-        elif "FuelTank" in src or "Pump" in src:
+        elif self.__is_pump_and_tank_system(event=event):
             return "pumps_and_tanks"
-        elif "Target" in dst:
-            return "tracking_widget"
-        elif "WarningLight" in src:
-            return "warning_lights"
-        elif "Scale" in src:
+        elif self.__is_scale_system(event=event):
             return "scales"
-        else:
+        elif self.__is_tracking_widget(event=event):
+            return "tracking_widget"
+        elif self.__is_warning_light_system(event=event):
+            return "warning_lights"
+        elif self.__is_eye_tracking(event=event):
             return "eye_tracker"
+        else:
+            return "unknown"
 
-    def __broadcast_event(self, event: Event) -> None:
-        for event_generator_group in self.__manager_agent_interfaces:
-            self.__notify_agent_with_event(managed_group=event_generator_group, event=event)
+    def __is_highlighting_event(self, event: Event) -> bool:
+        return "Highlight" in event.src
 
-    def notify_agent_with_events(self, managed_group: str, events: Iterator[Event]) -> None:
-        for event in events:
-            self.__notify_agent_with_event(managed_group=managed_group, event=event)
+    def __is_pump_and_tank_system(self, event: Event) -> bool:
+        return event.src == "PumpEventGenerator" or "FuelTank" in event.src or "Pump" in event.src or "Pump" in event.dst
 
-    def __notify_agent_with_event(self, managed_group: str, event: Event) -> None:
-        event_data: dict = event.serialise()
-        perception_data: dict = self.__build_perception_from_event(event_data=event_data, managed_group=managed_group)
+    def __is_scale_system(self, event: Event) -> bool:
+        return event.src == "ScaleEventGenerator" or "Scale" in event.dst
 
-        self.__notify_agent(managed_group=managed_group, perception_data=perception_data)
+    def __is_tracking_widget(self, event: Event) -> bool:
+        return event.src == "TargetEventGenerator" or "TrackingWidget" in event.dst
 
-    def __build_perception_from_event(self, event_data: dict, managed_group: str) -> dict:
-        return {"data": event_data, "metadata": {"event": "pull", "success": True, "src_group": managed_group, "src": event_data["dst"]}}
+    def __is_warning_light_system(self, event: Event) -> bool:
+        return event.src == "WarningLightEventGenerator" or "WarningLight" in event.dst
 
-    def __notify_agent(self, managed_group: str, perception_data: dict) -> None:
-        send_utf8_str(s=self.__manager_agent_interfaces[managed_group], content=dumps(perception_data))
+    def __is_eye_tracking(self, event: Event) -> bool:
+        return event.src == "EyeTrackerStub"
+
+    def __get_event_src(self, event: Event) -> str:
+        if self.__is_highlighting_event(event=event):
+            return event.dst
+        elif self.__is_pump_and_tank_system(event=event):
+            return self.__extract_pumps_and_tanks_event_src(event=event)
+        elif self.__is_scale_system(event=event):
+            return event.dst
+        elif self.__is_tracking_widget(event=event):
+            return event.dst
+        elif self.__is_warning_light_system(event=event):
+            return event.dst
+        elif self.__is_eye_tracking(event=event):
+            return "eye_tracker"
+        else:
+            return "irrelevant"
+
+    def __extract_pumps_and_tanks_event_src(self, event: Event) -> str:
+        if "Pump" in event.src or "FuelTank" in event.src:
+            return event.src
+        elif "Pump" in event.dst:
+            return event.dst
+        else:
+            raise ICUInconsistentStateException()
+
+    def __broadcast_event(self, event_data: dict, event_metadata: dict) -> None:
+        for _ in self.__manager_agent_interfaces:
+            self.__notify_agent_with_event(event_data=event_data, event_metadata=event_metadata)
+
+    def __notify_agent_with_event(self, event_data: dict, event_metadata: dict) -> None:
+        perception_data: dict = {"data": event_data, "metadata": event_metadata}
+
+        self.__notify_agent(perception_data=perception_data)
+
+    def __notify_agent(self, perception_data: dict) -> None:
+        src_group: str = perception_data["metadata"]["src_group"]
+
+        if src_group in self.__manager_agent_interfaces:
+            send_utf8_str(s=self.__manager_agent_interfaces[src_group], content=dumps(perception_data))
