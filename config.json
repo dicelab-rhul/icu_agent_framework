@@ -61,15 +61,17 @@
             "tanks": {
                 "FuelTankMain:A": {
                     "state_matters": true,
-                    "min_acceptable_state": 4,
-                    "max_acceptable_state": 6,
+                    "min_acceptable_state": 45,
+                    "max_acceptable_state": 55,
+                    "initial_level": 50,
                     "state": "acceptable"
                 },
                 "FuelTankMain:B": {
                     "state_matters": true,
-                    "min_acceptable_state": 4,
-                    "max_acceptable_state": 6,
-                    "state": "unacceptable"
+                    "min_acceptable_state": 1250,
+                    "max_acceptable_state": 1750,
+                    "initial_level": 1500,
+                    "state": "acceptable"
                 },
                 "FuelTank:C": {
                     "state_matters": false,

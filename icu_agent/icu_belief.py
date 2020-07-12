@@ -14,6 +14,7 @@ from icu_exceptions import ICUException, ICUAbstractMethodException
 class ICUBelief():
     def __init__(self, agent_id: str, managed_group: str, managed_group_info: dict):
         # TODO: these are magic numbers. They  should be read via the shared memory, and customised for each widget.
+        # TODO: check icu_gui_utils.icu_widgets for a tentative implementation of widget (and sub-widgets) coordinates.
         self._managed_group_left_border: int = 0
         self._managed_group_right_border: int = 800
         self._managed_group_top_border: int = 0

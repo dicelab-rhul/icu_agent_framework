@@ -132,6 +132,9 @@ class ICUManagerAgent(ICUAbstractAgent):
     def __begin_new_cycle(self, cycle_number: int) -> int:
         cycle_number += 1
 
+        if cycle_number % 7777 == 0:
+            print("####### All Lucky 7s! #######\nFinal Fantasy VII is the best videogame ever!\n####### All Lucky 7s! #######")
+
         return cycle_number
     
     def get_managed_group(self) -> str:
