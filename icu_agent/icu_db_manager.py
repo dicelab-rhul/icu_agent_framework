@@ -2,10 +2,11 @@ __author__ = "cloudstrife9999"
 
 from pymongo import MongoClient
 from json import load
+from typing import Union
 
 
 class ICUDBManager():
-    def __init__(self, config_file_path: str):
+    def __init__(self, config_file_path: str) -> None:
         self.__config_file_path: str = config_file_path
         self.__db_name: str = ""
         self.__collection: str = ""
@@ -42,7 +43,7 @@ class ICUDBManager():
         for elm in to_insert:
             self.insert(collection, elm)
 
-    def update(self, collection, query, updated) -> None:
+    def update(self, collection: str, query: Union[str, dict], updated: Union[str, dict]) -> None:
         self.__client[collection].update_one(query, updated)
 
     def get_db_name(self) -> str:

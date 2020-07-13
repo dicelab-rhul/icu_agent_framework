@@ -5,7 +5,7 @@ from json import dumps
 from icu_exceptions import ICUAbstractMethodException
 
 class ICUAction():
-    def __init__(self, name: str):
+    def __init__(self, name: str) -> None:
         self.__name:  str = name
 
     def get_name(self) -> str:
@@ -29,11 +29,11 @@ class ICUAction():
         return globals()[encoded["class_name"]].from_encoded_form(encoded=encoded)
 
 class ICUFeedbackAction(ICUAction):
-    def __init__(self, feedback: dict):
+    def __init__(self, feedback: dict) -> None:
         super().__init__("feed_back")
-        self.__feedback = feedback
+        self.__feedback: dict = feedback
 
-    def get_details(self):
+    def get_details(self) -> dict:
         return self.__feedback
 
     @staticmethod

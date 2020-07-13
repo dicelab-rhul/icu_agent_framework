@@ -1,6 +1,6 @@
 __author__ = "cloudstrife9999"
 
-from typing import List
+from typing import List, Callable, Tuple
 from multiprocessing import  Process
 from socket import socket, AF_INET, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
 from json import dumps, loads
@@ -35,7 +35,7 @@ Environment life cycle:
 '''
 
 class ICUEnvironmentDispatcher(Process):
-    def __init__(self, target, args=[]):
+    def __init__(self, target: Callable, args: tuple=()) -> None:
         super().__init__(target=target, args=args, group=None)
 
     def run(self) -> None:
@@ -52,7 +52,7 @@ class ICUEnvironmentDispatcher(Process):
             kill_process(self.pid, SIGKILL)
 
 class ICUAgentListener(Process):
-    def __init__(self, target, args=[]):
+    def __init__(self, target: Callable, args: tuple=()) -> None:
         super().__init__(target=target, args=args, group=None)
 
     def run(self) -> None:
@@ -130,7 +130,7 @@ class ICUEnvironment():
         event_generator_groups: dict = self.__config["systems"]
 
         for k, v in event_generator_groups.items():
-            env_interface: tuple = (self.__config["environment"]["env_hostname"], self.__config["environment"]["env_port"])
+            env_interface: Tuple[str, int] = (self.__config["environment"]["env_hostname"], self.__config["environment"]["env_port"])
             verbose: bool = self.__config["agents"]["verbose_agents"]
             backup_previous_perceptions: bool = self.__config["agents"]["backup_previous_perceptions"]
             agent: ICUManagerAgent = build_manager_agent(managed_group=k, managed_group_info=v, env_interface=env_interface, verbose=verbose, backup_previous_perceptions=backup_previous_perceptions)
@@ -142,14 +142,14 @@ class ICUEnvironment():
             
             self.__manager_agent_interfaces[k] = socket_with_agent
 
-    def __build_agent_listeners(self):
+    def __build_agent_listeners(self) -> None:
         for _, agent_interface in self.__manager_agent_interfaces.items():
             self.__agent_listeners.append(ICUAgentListener(target=self.__forward_feedback, args=[agent_interface]))
 
         for agent_listener in self.__agent_listeners:
             agent_listener.start()
 
-    def __forward_feedback(self, agent_interface: socket):
+    def __forward_feedback(self, agent_interface: socket) -> None:
         while True:
             raw: str = read_utf8_str(s=agent_interface)
             
@@ -176,7 +176,7 @@ class ICUEnvironment():
                 self.__notify_agent_with_event(event_data=event_data, event_metadata=event_metadata)
 
     def __is_event_useless(self, event_metadata: dict) -> bool:
-        return event_metadata["src_group"] in ["empty", "unknown", "eye_tracker"] #TODO: remove eye_tracker from this list  
+        return event_metadata["src_group"] in ["empty", "unknown"]
 
 
     def __get_event_metadata(self, event: Event) -> dict:

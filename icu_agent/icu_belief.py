@@ -7,12 +7,12 @@ if version_info.major + version_info.minor / 10 < 3.7:
 else:
     from time import time_ns as time
 
-from icu_environment.icu_feedback import ICUFeedback, highlight
+from icu_environment.icu_feedback import ICUFeedback
 from icu_exceptions import ICUException, ICUAbstractMethodException
 
 
 class ICUBelief():
-    def __init__(self, agent_id: str, managed_group: str, managed_group_info: dict):
+    def __init__(self, agent_id: str, managed_group: str, managed_group_info: dict) -> None:
         # TODO: these are magic numbers. They  should be read via the shared memory, and customised for each widget.
         # TODO: check icu_gui_utils.icu_widgets for a tentative implementation of widget (and sub-widgets) coordinates.
         self._managed_group_left_border: int = 0
@@ -79,7 +79,7 @@ class ICUBelief():
 
     def generate_feedback(self, dst: list) -> None:
         agent_id: str = self.get_agent_id()
-        feedback = highlight(agent_id=agent_id, dst=dst)
+        feedback: ICUFeedback = ICUFeedback.highlight(agent_id=agent_id, dst=dst)
         self._set_next_feedback(feedback)
 
     def _set_next_feedback(self, feedback: ICUFeedback) -> None:
@@ -104,14 +104,13 @@ class ICUBelief():
     def is_user_looking(self) -> bool:
         x, y = self._user_eyes_location
 
+        assert isinstance(x, int) and isinstance(y, int)
+
         # Remember that (0, 0) represents the top-left point.
         return x > self._managed_group_left_border and x < self._managed_group_right_border and y > self._managed_group_top_border and y < self._managed_group_bottom_border
 
 
 class ICUWarningLightBelief(ICUBelief):
-    def __init__(self, agent_id: str, managed_group: str, managed_group_info: dict):
-        super().__init__(agent_id=agent_id, managed_group=managed_group, managed_group_info=managed_group_info)
-
     def _unpack_event_generators(self) -> list:
         return [generator for generator in filter(lambda k: "light" in k, self._managed_group_info)]
 
@@ -158,9 +157,6 @@ class ICUWarningLightBelief(ICUBelief):
                 self._current_state["red_light"]["state"] = "off"
 
 class ICUScaleBelief(ICUBelief):
-    def __init__(self, agent_id: str,  managed_group: str, managed_group_info: dict):
-        super().__init__(agent_id=agent_id, managed_group=managed_group, managed_group_info=managed_group_info)
-
     def _unpack_event_generators(self) -> list:
         return [generator for generator in filter(lambda k: "Scale" in k, self._managed_group_info)]
 
@@ -222,9 +218,6 @@ class ICUScaleBelief(ICUBelief):
             self._current_state[src]["state"] = 0
 
 class ICUPumpBelief(ICUBelief):
-    def __init__(self, agent_id: str, managed_group: str, managed_group_info: dict):
-        super().__init__(agent_id=agent_id, managed_group=managed_group, managed_group_info=managed_group_info)
-
     def _unpack_event_generators(self) -> list:
         return [generator for generator in filter(lambda k: "pumps" in k or "tanks" in k, self._managed_group_info)]
 
@@ -264,9 +257,6 @@ class ICUPumpBelief(ICUBelief):
                 self._current_state[src]["state"] = "unacceptable"
 
 class ICUTrackingWidgetBelief(ICUBelief):
-    def __init__(self, agent_id: str, managed_group: str, managed_group_info: dict):
-        super().__init__(agent_id=agent_id, managed_group=managed_group, managed_group_info=managed_group_info)
-
     def _unpack_event_generators(self) -> list:
         return [generator for generator in filter(lambda k: "target" in k, self._managed_group_info)]
 

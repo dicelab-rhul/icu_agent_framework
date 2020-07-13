@@ -1,20 +1,18 @@
 __author__ = "cloudstrife9999"
 
 class ICUException(Exception):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    pass
 
 
 class ICUAbstractMethodException(ICUException):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("Abstract method.")
 
 
 class ICUUnsupportedOperationException(ICUException):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    pass
 
 
 class ICUInconsistentStateException(ICUException):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("Inconsistent state.")

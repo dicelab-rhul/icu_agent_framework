@@ -2,7 +2,7 @@ __author__ = "cloudstrife9999"
 
 
 from multiprocessing import Process
-from typing import Optional, Tuple, Iterator
+from typing import Optional, Tuple, Iterator, Callable, Any, Union
 from time import sleep
 from contextlib import redirect_stdout
 from sys import version_info
@@ -22,7 +22,7 @@ from icu.process import PipedMemory
 from psychopy.iohub import launchHubServer
 
 class EyeTrackerProcess(Process):
-    def __init__(self, target, args=[]):
+    def __init__(self, target: Callable, args: Tuple=()) -> None:
         super().__init__(target=target, args=args, group=None)
 
     def run(self) -> None:
@@ -32,9 +32,9 @@ class EyeTrackerProcess(Process):
             print("{}: stopped.".format(type(self).__name__))
 
 
-    def __run_eye_tracker(self, duration=5, calibrate_system=True, sample_rate=40) -> None:
+    def __run_eye_tracker(self, duration: int=5, calibrate_system :bool=True, sample_rate :int=40) -> None:
          with self.__connect_eyetracker(sample_rate=sample_rate) as io:
-            tracker = io.devices.tracker
+            tracker: Any = io.devices.tracker
             
             if calibrate_system:
                 self.__calibrate(tracker)
@@ -43,28 +43,28 @@ class EyeTrackerProcess(Process):
                 print(event) #do some stuff
 
 
-    def __connect_eyetracker(self, sample_rate = 300):    
-        iohub_config = {'eyetracker.hw.tobii.EyeTracker':
+    def __connect_eyetracker(self, sample_rate: int=300) -> Any:    
+        iohub_config: dict = {'eyetracker.hw.tobii.EyeTracker':
             {'name': 'tracker',
             'runtime_settings': {'sampling_rate': sample_rate}}
             }
         
-        io = launchHubServer(**iohub_config)    
+        io: Any = launchHubServer(**iohub_config)    
 
         return io
 
-    def __calibrate(self, tracker) -> None:
-        r = tracker.runSetupProcedure()
+    def __calibrate(self, tracker: Any) -> None:
+        r: Any = tracker.runSetupProcedure()
         
         if r:
             print('calibration success')
         else:
             print('calibration unsuccessful')
 
-    def __stream(self, tracker, duration) -> Iterator:
+    def __stream(self, tracker: Any, duration: Union[int, float]) -> Iterator:
         tracker.setRecordingState(True)
 
-        stime = time()
+        stime: float = time()
         while time()-stime < duration:
             for e in tracker.getEvents(asType='dict'):
                 #logic to remove bad samples
@@ -73,7 +73,7 @@ class EyeTrackerProcess(Process):
 # END OF POTENTIALLY UNNEDED CODE #
 
 class ICUApplicationSimulator():
-    def __init__(self, verbose=False):
+    def __init__(self, verbose: bool=False) -> None:
         self.__verbose: bool = verbose
         self.__source: ExternalEventSource = ExternalEventSource()
         self.__sink: ExternalEventSink = ExternalEventSink()

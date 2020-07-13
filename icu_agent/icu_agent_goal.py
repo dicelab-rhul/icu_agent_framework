@@ -6,7 +6,7 @@ from icu_agent.icu_actions import ICUAction, ICUFeedbackAction
 
 
 class ICUMindGoal():
-    def __init__(self):
+    def __init__(self) -> None:
         self._need_to_feedback: bool = False
         self.__feedback: dict = {}
         self.__next_action: Optional[ICUAction] = None

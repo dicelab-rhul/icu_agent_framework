@@ -9,9 +9,9 @@ from icu_environment.icu_environment import ICUEnvironment
 
 
 def check_preconditions() -> bool:
-    minimum_major = 3
-    minimum_minor = 6
-    minimum_version = "{}.{}".format(minimum_major, minimum_minor)
+    minimum_major: int = 3
+    minimum_minor: int = 6
+    minimum_version: str = "{}.{}".format(minimum_major, minimum_minor)
 
     if version_info.major < minimum_major or version_info.minor < minimum_minor:
         print("The minimum required version of Python is {}, while {}.{} was found.".format(minimum_version, version_info.major, version_info.minor))

@@ -11,8 +11,8 @@ from icu_exceptions import ICUAbstractMethodException
 
 
 class ICUTeleoreactiveMind():
-    def __init__(self, managed_group: str, managed_group_info: dict, storage: ICUMindStorage, backup_previous_perceptions: bool):
-        self.__id = str(uuid4())
+    def __init__(self, managed_group: str, managed_group_info: dict, storage: ICUMindStorage, backup_previous_perceptions: bool) -> None:
+        self.__id: str = str(uuid4())
         self.__storage: ICUMindStorage = storage
         self.__working_memory: ICUMindWorkingMemory = self.__init_working_memory(managed_group=managed_group, managed_group_info=managed_group_info)
         self.__backup_previous_perceptions: bool = backup_previous_perceptions
@@ -53,13 +53,13 @@ class ICUTeleoreactiveMind():
 
     def _consider_sending_feedback(self, belief: ICUBelief, goal: ICUMindGoal, dst: list=[]) -> None:
         if not belief.is_user_looking():
-            self._generate_and_send_feedback(goal=goal, dst=dst)
+            self._generate_and_set_feedback(goal=goal, dst=dst)
         elif belief.grace_period_expired():
-            self._generate_and_send_feedback(goal=goal, dst=dst)
+            self._generate_and_set_feedback(goal=goal, dst=dst)
         else:
             goal.stay_idle()
 
-    def _generate_and_send_feedback(self, goal: ICUMindGoal, dst: list) -> None:
+    def _generate_and_set_feedback(self, goal: ICUMindGoal, dst: list) -> None:
         self.__working_memory.get_belief().generate_feedback(dst=dst)
 
         feedback: dict = self.__working_memory.get_belief().get_next_feedback().get()
@@ -94,9 +94,6 @@ class ICUTeleoreactiveMind():
 
 
 class ICUTrackingWidgetMind(ICUTeleoreactiveMind):
-    def __init__(self, managed_group, managed_group_info, storage, backup_previous_perceptions):
-        super().__init__(managed_group, managed_group_info, storage, backup_previous_perceptions)
-
     def decide(self) -> None:
         belief: ICUTrackingWidgetBelief = self._cast_belief(belief=self.get_working_memory().get_belief(), real_type=ICUTrackingWidgetBelief)
         goal: ICUMindGoal = self.get_working_memory().get_goal()
@@ -117,9 +114,6 @@ class ICUTrackingWidgetMind(ICUTeleoreactiveMind):
 
 
 class ICUScaleMind(ICUTeleoreactiveMind):
-    def __init__(self, managed_group, managed_group_info, storage, backup_previous_perceptions):
-        super().__init__(managed_group, managed_group_info, storage, backup_previous_perceptions)
-
     def decide(self) -> None:
         belief: ICUScaleBelief = self._cast_belief(belief=self.get_working_memory().get_belief(), real_type=ICUScaleBelief)
         goal: ICUMindGoal = self.get_working_memory().get_goal()
@@ -134,9 +128,6 @@ class ICUScaleMind(ICUTeleoreactiveMind):
             goal.stay_idle()
 
 class ICUPumpMind(ICUTeleoreactiveMind):
-    def __init__(self, managed_group, managed_group_info, storage, backup_previous_perceptions):
-        super().__init__(managed_group, managed_group_info, storage, backup_previous_perceptions)
-
     def decide(self) -> None:
         belief: ICUPumpBelief = self._cast_belief(belief=self.get_working_memory().get_belief(), real_type=ICUPumpBelief)
         goal: ICUMindGoal = self.get_working_memory().get_goal()
@@ -149,9 +140,6 @@ class ICUPumpMind(ICUTeleoreactiveMind):
             goal.stay_idle()
 
 class ICUWarningLightMind(ICUTeleoreactiveMind):
-    def __init__(self, managed_group, managed_group_info, storage, backup_previous_perceptions):
-        super().__init__(managed_group, managed_group_info, storage, backup_previous_perceptions)
-
     def decide(self) -> None:
         belief: ICUWarningLightBelief = self._cast_belief(belief=self.get_working_memory().get_belief(), real_type=ICUWarningLightBelief)
         goal: ICUMindGoal = self.get_working_memory().get_goal()

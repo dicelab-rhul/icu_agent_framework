@@ -14,7 +14,7 @@ from icu_socket_utils import read_utf8_str, send_utf8_str
 
 
 class ICUAgentProcess(Process):
-    def __init__(self, agent_id: str, managed_generator: str, target: Optional[Callable[..., Any]]):
+    def __init__(self, agent_id: str, managed_generator: str, target: Optional[Callable[..., Any]]) -> None:
         super().__init__(target=target, group=None)
 
         self.__agent_id: str = agent_id
@@ -38,7 +38,7 @@ class ICUAgentProcess(Process):
 
 
 class ICUAbstractAgent():
-    def __init__(self, mind: ICUTeleoreactiveMind):
+    def __init__(self, mind: ICUTeleoreactiveMind) -> None:
         self.__mind: ICUTeleoreactiveMind = mind
 
     def get_mind(self) -> ICUTeleoreactiveMind:
@@ -55,7 +55,7 @@ class ICUAbstractAgent():
 
 
 class ICUManagerAgent(ICUAbstractAgent):
-    def __init__(self, mind: ICUTeleoreactiveMind, actuators: list, sensors: list, env_hostname: str, env_port: int, verbose=False):
+    def __init__(self, mind: ICUTeleoreactiveMind, actuators: list, sensors: list, env_hostname: str, env_port: int, verbose: bool=False) -> None:
         super().__init__(mind=mind)
 
         self.__verbose: bool = verbose
@@ -88,11 +88,13 @@ class ICUManagerAgent(ICUAbstractAgent):
     def __activate(self) -> None:
         while not self.__connected:
             try:
+                #TODO: maybe there is a better way to avoid the race condition with the environment.
                 sleep(0.5)
                 self.__env_socket.connect((self.__env_hostname, self.__env_port))
                 self.__connected = True
-            except Exception as e:
-                print(e)
+            except Exception:
+                # We keep trying until we connect.
+                # TODO: what if the enviroment never becomes available? This code will loop indefinitely.
                 continue
 
         self.__actuators[0].activate(self.__env_socket)
@@ -112,9 +114,9 @@ class ICUManagerAgent(ICUAbstractAgent):
         except KeyboardInterrupt:
             self.__env_socket.close()
             print("Agent {}: killed by a keyboard interrupt.".format(self.get_id()))
-        except Exception:
+        except Exception as e:
             self.__env_socket.close()
-            print("Agent {}: killed by exception:".format(self.get_id()))
+            print("Agent {}: killed by exception: {}".format(self.get_id(), e))
 
     def __cycle_step(self, cycle_number: int) -> None:
         if cycle_number > 1:
